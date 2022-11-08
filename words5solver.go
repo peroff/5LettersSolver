@@ -18,8 +18,6 @@ type wordsBase struct {
 	runeFreq map[rune]float64
 }
 
-type charSet map[rune]struct{}
-
 type wordFilter struct {
 	deadChars  charSet
 	badChars   [wordLen]charSet
@@ -28,23 +26,21 @@ type wordFilter struct {
 }
 
 func (f *wordFilter) checkWord(word string) bool {
-	chars := make(charSet)
+	chars := newCharSet()
 	for i, c := range []rune(word) {
 		if fc := f.fixedChars[i]; fc != 0 && c != fc {
 			return false
 		}
-		if _, ok := f.deadChars[c]; ok {
+		if f.deadChars.has(c) {
 			return false
 		}
-		if _, ok := f.badChars[i][c]; ok {
+		if f.badChars[i].has(c) {
 			return false
 		}
-		chars[c] = struct{}{}
+		chars.add(c)
 	}
-	for rc, _ := range f.reqChars {
-		if _, ok := chars[rc]; !ok {
-			return false
-		}
+	if !chars.hasAll(f.reqChars) {
+		return false
 	}
 	return true
 }
@@ -101,10 +97,10 @@ func updateWordFilter(filter *wordFilter, lastWord, answer string) error {
 		case '+':
 			filter.fixedChars[i] = lwc
 		case '-':
-			filter.deadChars[lwc] = struct{}{}
+			filter.deadChars.add(lwc)
 		case '?':
-			filter.badChars[i][lwc] = struct{}{}
-			filter.reqChars[lwc] = struct{}{}
+			filter.badChars[i].add(lwc)
+			filter.reqChars.add(lwc)
 		default:
 			return fmt.Errorf("unknown char \"%c\"", c)
 		}
@@ -120,11 +116,11 @@ func main() {
 	fmt.Printf("Loaded words: %d\n", len(base.items))
 
 	filter := &wordFilter{}
-	filter.deadChars = make(charSet)
+	filter.deadChars = newCharSet()
 	for i := 0; i < wordLen; i++ {
-		filter.badChars[i] = make(charSet)
+		filter.badChars[i] = newCharSet()
 	}
-	filter.reqChars = make(charSet)
+	filter.reqChars = newCharSet()
 
 	move := 1
 	firstWord := getFirstWord(base)
