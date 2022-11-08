@@ -62,25 +62,6 @@ func selectWords(base *wordsBase, filter *wordFilter) []string {
 	return res
 }
 
-func updateWordFilter(filter *wordFilter, lastWord, answer string) error {
-	lwChars := []rune(lastWord)
-	for i, c := range []rune(answer) {
-		lwc := lwChars[i]
-		switch c {
-		case '+':
-			filter.fixedChars[i] = lwc
-		case '-':
-			filter.deadChars.add(lwc)
-		case '?':
-			filter.badChars[i].add(lwc)
-			filter.reqChars.add(lwc)
-		default:
-			return fmt.Errorf("unknown char \"%c\"", c)
-		}
-	}
-	return nil
-}
-
 func main() {
 	base, err := loadBase("words.txt")
 	if err != nil {
@@ -110,7 +91,7 @@ func main() {
 		}
 
 		if waitingForAnswer {
-			err := updateWordFilter(filter, lastWord, s)
+			err := filter.update(lastWord, s)
 			if err != nil {
 				fmt.Printf("Wrong filter: %s\n", err)
 				continue

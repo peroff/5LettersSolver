@@ -1,10 +1,31 @@
 package main
 
+import "fmt"
+
 type wordFilter struct {
 	deadChars  charSet
 	badChars   [wordLen]charSet
 	reqChars   charSet
 	fixedChars [wordLen]rune
+}
+
+func (f *wordFilter) update(lastWord, answer string) error {
+	lwChars := []rune(lastWord)
+	for i, c := range []rune(answer) {
+		lwc := lwChars[i]
+		switch c {
+		case '+':
+			f.fixedChars[i] = lwc
+		case '-':
+			f.deadChars.add(lwc)
+		case '?':
+			f.badChars[i].add(lwc)
+			f.reqChars.add(lwc)
+		default:
+			return fmt.Errorf("unknown char \"%c\"", c)
+		}
+	}
+	return nil
 }
 
 func (f *wordFilter) checkWord(word string) bool {
