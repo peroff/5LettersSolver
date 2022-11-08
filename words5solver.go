@@ -9,6 +9,8 @@ import (
 	"unicode/utf8"
 )
 
+const version = "0.1"
+
 const wordLen = 5
 
 func getFirstWord(base *wordsBase) string {
@@ -26,6 +28,16 @@ func selectWords(base *wordsBase, filter *wordFilter) []string {
 }
 
 func main() {
+	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022\n", version)
+	fmt.Println()
+	fmt.Println("To enter the app's response to your attempt use symbols:")
+	fmt.Println("  '+' : found and correctly placed letter")
+	fmt.Println("  '?' or")
+	fmt.Println("  '*' or")
+	fmt.Println("  '.' : found but misplaced letter")
+	fmt.Println("  '-' : wrong letter")
+	fmt.Println()
+
 	base, err := loadBase("words.txt")
 	if err != nil {
 		log.Fatal(err)
