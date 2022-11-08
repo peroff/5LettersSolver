@@ -18,33 +18,6 @@ type wordsBase struct {
 	runeFreq map[rune]float64
 }
 
-type wordFilter struct {
-	deadChars  charSet
-	badChars   [wordLen]charSet
-	reqChars   charSet
-	fixedChars [wordLen]rune
-}
-
-func (f *wordFilter) checkWord(word string) bool {
-	chars := newCharSet()
-	for i, c := range []rune(word) {
-		if fc := f.fixedChars[i]; fc != 0 && c != fc {
-			return false
-		}
-		if f.deadChars.has(c) {
-			return false
-		}
-		if f.badChars[i].has(c) {
-			return false
-		}
-		chars.add(c)
-	}
-	if !chars.hasAll(f.reqChars) {
-		return false
-	}
-	return true
-}
-
 func loadBase(fileName string) (*wordsBase, error) {
 	b, err := ioutil.ReadFile(fileName)
 	if err != nil {
@@ -115,12 +88,7 @@ func main() {
 	}
 	fmt.Printf("Loaded words: %d\n", len(base.items))
 
-	filter := &wordFilter{}
-	filter.deadChars = newCharSet()
-	for i := 0; i < wordLen; i++ {
-		filter.badChars[i] = newCharSet()
-	}
-	filter.reqChars = newCharSet()
+	filter := newWordFilter()
 
 	move := 1
 	firstWord := getFirstWord(base)
