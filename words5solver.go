@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -48,42 +47,6 @@ func (f *wordFilter) checkWord(word string) bool {
 		}
 	}
 	return true
-}
-
-func rebuildBase() {
-	b, err := ioutil.ReadFile("raw_words.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	var base bytes.Buffer
-	n := 0
-
-	text := string(b)
-	lines := strings.Split(text, "\n")
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		words := strings.Fields(line)
-		for _, word := range words {
-			word = strings.TrimSpace(word)
-			if word == "" || word[len(word)-1] == '.' {
-				continue
-			}
-			word = strings.ToLower(word)
-			if n > 0 {
-				base.WriteRune('\n')
-			}
-			base.WriteString(word)
-			n++
-		}
-	}
-
-	err = ioutil.WriteFile("words.txt", base.Bytes(), 0600)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	fmt.Printf("Words written: %d\n", n)
 }
 
 func loadBase(fileName string) (*wordsBase, error) {
@@ -150,8 +113,6 @@ func updateWordFilter(filter *wordFilter, lastWord, answer string) error {
 }
 
 func main() {
-	// rebuildBase()
-
 	base, err := loadBase("words.txt")
 	if err != nil {
 		log.Fatal(err)
