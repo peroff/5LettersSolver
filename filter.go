@@ -24,7 +24,7 @@ func (f *wordFilter) update(lastWord, answer string) error {
 			f.fixedChars[i] = lwc
 		case '-':
 			f.deadChars.add(lwc)
-		case '?':
+		case '?', '*', '.':
 			f.badChars[i].add(lwc)
 			f.reqChars.add(lwc)
 		default:
