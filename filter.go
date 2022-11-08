@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 type wordFilter struct {
 	deadChars  charSet
@@ -11,9 +14,12 @@ type wordFilter struct {
 
 func (f *wordFilter) update(lastWord, answer string) error {
 	lwChars := []rune(lastWord)
-	for i, c := range []rune(answer) {
-		lwc := lwChars[i]
-		switch c {
+	aChars := []rune(answer)
+	if len(lwChars) != wordLen || len(aChars) != wordLen {
+		return errors.New("wrong word length")
+	}
+	for i, lwc := range lwChars {
+		switch aChars[i] {
 		case '+':
 			f.fixedChars[i] = lwc
 		case '-':
@@ -22,7 +28,7 @@ func (f *wordFilter) update(lastWord, answer string) error {
 			f.badChars[i].add(lwc)
 			f.reqChars.add(lwc)
 		default:
-			return fmt.Errorf("unknown char \"%c\"", c)
+			return fmt.Errorf("unknown char \"%c\"", aChars[i])
 		}
 	}
 	return nil
