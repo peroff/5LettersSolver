@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"unicode/utf8"
@@ -33,7 +32,8 @@ func main() {
 
 	base, err := loadBase("words.txt")
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("Words base loading error: %s\n", err)
+		return
 	}
 	fmt.Printf("Loaded words: %d\n\n", len(base.items))
 
@@ -86,8 +86,7 @@ func main() {
 			waitingForAnswer = true
 		}
 	}
-	err = input.Err()
-	if err != nil {
+	if err := input.Err(); err != nil {
 		panic(fmt.Sprintf("input scanning error: %s", err))
 	}
 }
