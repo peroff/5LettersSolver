@@ -30,63 +30,64 @@ func selectWords(base *wordsBase, filter *wordFilter) []string {
 func main() {
 	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022\n", version)
 	fmt.Println()
-	fmt.Println("To enter the app's response to your attempt use symbols:")
-	fmt.Println("  '+' : found and correctly placed letter")
-	fmt.Println("  '?' or")
-	fmt.Println("  '*' or")
-	fmt.Println("  '.' : found but misplaced letter")
-	fmt.Println("  '-' : wrong letter")
-	fmt.Println()
 
 	base, err := loadBase("words.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("Loaded words: %d\n", len(base.items))
+	fmt.Printf("Loaded words: %d\n\n", len(base.items))
 
 	filter := newWordFilter()
 
 	move := 1
 	firstWord := getFirstWord(base)
-	fmt.Printf("%d. Start word: %s\n", move, firstWord)
 	lastWord := firstWord
-
-	fmt.Printf("%d. Answer: ", move)
+	fmt.Printf("%d. Start with word: %s\n", move, firstWord)
 	waitingForAnswer := true
 
 	input := bufio.NewScanner(os.Stdin)
-	for input.Scan() {
+	for {
+		if waitingForAnswer {
+			fmt.Printf("%d. Enter app's response, 5 symbols: '+' - correct letter, '-' - wrong letter,\n", move)
+			fmt.Printf("   '?', '*' or '.' - misplaced letter. Response (empty for exit): ")
+		} else {
+			fmt.Printf("%d. Enter your next word (same there and in the app): ", move)
+		}
+
+		if !input.Scan() {
+			break
+		}
 		s := strings.TrimSpace(input.Text())
 		if s == "" {
 			break
 		}
 		if utf8.RuneCountInString(s) != wordLen {
-			fmt.Println("Wrong input")
+			fmt.Printf("Wrong input length\n\n")
 			continue
 		}
 
 		if waitingForAnswer {
 			err := filter.update(lastWord, s)
 			if err != nil {
-				fmt.Printf("Wrong filter: %s\n", err)
+				fmt.Printf("Wrong filter: %s\n\n", err)
 				continue
 			}
 			words := selectWords(base, filter)
 			move++
+			fmt.Println()
 			fmt.Printf("%d. Possible words (%d):\n", move, len(words))
 			for _, w := range words {
 				fmt.Println(w)
 			}
-			fmt.Printf("%d. Your word: ", move)
+			fmt.Println()
 			waitingForAnswer = false
 		} else {
 			lastWord = s
-			fmt.Printf("%d. Answer: ", move)
 			waitingForAnswer = true
 		}
 	}
 	err = input.Err()
 	if err != nil {
-		panic(fmt.Sprintf("input scanning error: %s\n", err))
+		panic(fmt.Sprintf("input scanning error: %s", err))
 	}
 }
