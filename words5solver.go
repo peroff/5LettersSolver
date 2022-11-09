@@ -38,16 +38,15 @@ func main() {
 	fmt.Printf("Loaded words: %d\n\n", len(base.items))
 
 	filter := newWordFilter()
+	input := bufio.NewScanner(os.Stdin)
 
 	move := 1
-	firstWord := getFirstWord(base)
-	lastWord := firstWord
-	fmt.Printf("%d. Start with word: %s\n", move, firstWord)
-	waitingForAnswer := true
+	currentWord := getFirstWord(base)
+	fmt.Printf("%d. Start with word: %s\n", move, currentWord)
+	waitingForResponse := true
 
-	input := bufio.NewScanner(os.Stdin)
 	for {
-		if waitingForAnswer {
+		if waitingForResponse {
 			fmt.Printf("%d. Enter app's response, 5 symbols: '+' - correct letter, '-' - wrong letter,\n", move)
 			fmt.Printf("   '?', '*' or '.' - misplaced letter. Response (empty for exit): ")
 		} else {
@@ -66,9 +65,8 @@ func main() {
 			continue
 		}
 
-		if waitingForAnswer {
-			err := filter.update(lastWord, s)
-			if err != nil {
+		if waitingForResponse {
+			if err := filter.update(currentWord, s); err != nil {
 				fmt.Printf("Wrong filter: %s\n\n", err)
 				continue
 			}
@@ -80,10 +78,10 @@ func main() {
 				fmt.Println(w)
 			}
 			fmt.Println()
-			waitingForAnswer = false
+			waitingForResponse = false
 		} else {
-			lastWord = s
-			waitingForAnswer = true
+			currentWord = s
+			waitingForResponse = true
 		}
 	}
 	if err := input.Err(); err != nil {
