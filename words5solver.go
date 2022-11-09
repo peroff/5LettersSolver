@@ -10,7 +10,10 @@ import (
 
 const version = "0.1"
 
-const wordLen = 5
+const (
+	wordLen  = 5
+	maxWords = 200
+)
 
 func getFirstWord(base *wordsBase) string {
 	return "буква"
@@ -71,12 +74,17 @@ func main() {
 				continue
 			}
 			words := selectWords(base, filter)
+			total := len(words)
+			if total > maxWords {
+				words = words[:maxWords]
+			}
 			move++
 			fmt.Println()
-			fmt.Printf("%d. Possible words (%d):\n", move, len(words))
+			fmt.Printf("%d. Possible words:\n", move)
 			for _, w := range words {
 				fmt.Println(w)
 			}
+			fmt.Printf("(%d total, %d shown)\n", total, len(words))
 			fmt.Println()
 			waitingForResponse = false
 		} else {
