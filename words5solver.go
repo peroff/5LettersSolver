@@ -11,8 +11,9 @@ import (
 const version = "0.1"
 
 const (
-	wordLen  = 5
-	maxWords = 200
+	wordLen     = 5
+	maxWords    = 200
+	wordsInLine = 10
 )
 
 func getFirstWord(base *wordsBase) string {
@@ -27,6 +28,21 @@ func selectWords(base *wordsBase, filter *wordFilter) []string {
 		}
 	}
 	return res
+}
+
+func printWords(words []string) {
+	total := len(words)
+	if total > maxWords {
+		words = words[:maxWords]
+	}
+	for offs := 0; offs < len(words); offs += wordsInLine {
+		cnt := len(words) - offs
+		if cnt > wordsInLine {
+			cnt = wordsInLine
+		}
+		fmt.Printf("  %s\n", strings.Join(words[offs:offs+cnt], ", "))
+	}
+	fmt.Printf("(%d total, %d shown)\n", total, len(words))
 }
 
 func main() {
@@ -48,6 +64,7 @@ func main() {
 	fmt.Printf("%d. Start with word: %s\n", move, currentWord)
 	waitingForResponse := true
 
+mainLp:
 	for {
 		if waitingForResponse {
 			fmt.Printf("%d. Enter app's response, 5 symbols: '+' - correct letter, '-' - wrong letter,\n", move)
@@ -73,19 +90,24 @@ func main() {
 				fmt.Printf("Wrong filter: %s\n\n", err)
 				continue
 			}
-			words := selectWords(base, filter)
-			total := len(words)
-			if total > maxWords {
-				words = words[:maxWords]
-			}
 			move++
-			fmt.Println()
-			fmt.Printf("%d. Possible words:\n", move)
-			for _, w := range words {
-				fmt.Println(w)
+			words := selectWords(base, filter)
+			switch len(words) {
+			case 0:
+				fmt.Printf("\nNo possible words found :( Sorry...\n\n")
+				fmt.Print("Press ENTER for exit")
+				input.Scan()
+				break mainLp
+			case 1:
+				fmt.Printf("\nFOUND! Your word: %s\n\n", words[0])
+				fmt.Print("Press ENTER for exit")
+				input.Scan()
+				break mainLp
+			default:
+				fmt.Printf("\n%d. Possible words:\n", move)
+				printWords(words)
+				fmt.Println()
 			}
-			fmt.Printf("(%d total, %d shown)\n", total, len(words))
-			fmt.Println()
 			waitingForResponse = false
 		} else {
 			if !base.hasWord(s) {
