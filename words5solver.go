@@ -88,6 +88,10 @@ func main() {
 			fmt.Println()
 			waitingForResponse = false
 		} else {
+			if !base.hasWord(s) {
+				fmt.Printf("Unknown word \"%s\"\n\n", s)
+				continue
+			}
 			currentWord = s
 			waitingForResponse = true
 		}
