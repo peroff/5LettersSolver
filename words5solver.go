@@ -61,7 +61,7 @@ func main() {
 
 	move := 1
 	currentWord := getFirstWord(base)
-	fmt.Printf("%d. Start with word: %s\n", move, currentWord)
+	fmt.Printf("%d. Start with word: [%s]\n", move, currentWord)
 	waitingForResponse := true
 
 mainLp:
@@ -99,7 +99,7 @@ mainLp:
 				input.Scan()
 				break mainLp
 			case 1:
-				fmt.Printf("\nFOUND! Your word: %s\n\n", words[0])
+				fmt.Printf("\nFOUND! Your word: [%s]\n\n", words[0])
 				fmt.Print("Press ENTER for exit")
 				input.Scan()
 				break mainLp
