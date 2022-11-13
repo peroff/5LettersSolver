@@ -68,7 +68,7 @@ mainLp:
 	for {
 		if waitingForResponse {
 			fmt.Printf("%d. Enter app's response, 5 symbols: '+' - correct letter, '-' - wrong letter,\n", move)
-			fmt.Printf("   '?', '*' or '.' - misplaced letter. Response (empty for exit): ")
+			fmt.Printf("   '.' - misplaced letter. Response (empty for exit): ")
 		} else {
 			fmt.Printf("%d. Enter your next word (same there and in the app): ", move)
 		}
