@@ -7,8 +7,9 @@ import (
 )
 
 type wordsBase struct {
-	items    []string
-	charsFreq map[rune]float64
+	items           []string
+	charsFreq       map[rune]float64
+	itemFreqIndexes map[string]float64
 }
 
 func loadBase(fileName string) (*wordsBase, error) {
@@ -18,8 +19,9 @@ func loadBase(fileName string) (*wordsBase, error) {
 	}
 
 	base := &wordsBase{
-		items:    strings.Split(string(b), "\n"),
-		charsFreq: make(map[rune]float64),
+		items:           strings.Split(string(b), "\n"),
+		charsFreq:       make(map[rune]float64),
+		itemFreqIndexes: make(map[string]float64),
 	}
 
 	if len(base.items) == 0 {
@@ -40,6 +42,16 @@ func loadBase(fileName string) (*wordsBase, error) {
 
 	for c, n := range wordsByChar {
 		base.charsFreq[c] = float64(n) / float64(len(base.items))
+	}
+
+	for _, word := range base.items {
+		wordChars.clear()
+		for _, c := range word {
+			if !wordChars.has(c) {
+				base.itemFreqIndexes[word] += base.charsFreq[c]
+				wordChars.add(c)
+			}
+		}
 	}
 
 	return base, nil
