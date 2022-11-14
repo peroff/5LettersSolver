@@ -58,6 +58,7 @@ func selectWords(base *wordsBase, filter *wordFilter) []string {
 			res = append(res, word)
 		}
 	}
+	sortWordsByCharsFreq(res, base)
 	return res
 }
 
