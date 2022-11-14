@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"unicode/utf8"
 )
@@ -16,8 +17,38 @@ const (
 	wordsInLine = 10
 )
 
+type wordsInfo struct {
+	words []string
+	base  *wordsBase
+}
+
+func (wi *wordsInfo) Len() int { return len(wi.words) }
+
+func (wi *wordsInfo) Less(i, j int) bool {
+	f1 := wi.base.itemFreqIndexes[wi.words[i]]
+	f2 := wi.base.itemFreqIndexes[wi.words[j]]
+	if f1 != f2 {
+		return f1 > f2
+	} else {
+		return strings.Compare(wi.words[i], wi.words[j]) > 0
+	}
+}
+
+func (wi *wordsInfo) Swap(i, j int) {
+	wi.words[i], wi.words[j] = wi.words[j], wi.words[i]
+}
+
+func sortWordsByCharsFreq(words []string, base *wordsBase) {
+	info := &wordsInfo{words, base}
+	sort.Sort(info)
+}
+
 func getFirstWord(base *wordsBase) string {
-	return "буква"
+	words := make([]string, len(base.items))
+	copy(words, base.items)
+	sortWordsByCharsFreq(words, base)
+	// printWords(words)
+	return words[0]
 }
 
 func selectWords(base *wordsBase, filter *wordFilter) []string {
