@@ -9,7 +9,7 @@ import (
 	"unicode/utf8"
 )
 
-const version = "0.2"
+const version = "0.3"
 
 const (
 	wordLen     = 5
