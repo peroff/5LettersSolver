@@ -27,11 +27,7 @@ func (wi *wordsInfo) Len() int { return len(wi.words) }
 func (wi *wordsInfo) Less(i, j int) bool {
 	f1 := wi.base.itemFreqIndexes[wi.words[i]]
 	f2 := wi.base.itemFreqIndexes[wi.words[j]]
-	if f1 != f2 {
-		return f1 > f2
-	} else {
-		return strings.Compare(wi.words[i], wi.words[j]) > 0
-	}
+	return f1 >= f2
 }
 
 func (wi *wordsInfo) Swap(i, j int) {
