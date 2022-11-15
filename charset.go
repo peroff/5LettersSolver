@@ -3,7 +3,7 @@ package main
 type charSet map[rune]struct{}
 
 func (cs charSet) clear() {
-	for c, _ := range cs {
+	for c := range cs {
 		delete(cs, c)
 	}
 }

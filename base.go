@@ -7,8 +7,9 @@ import (
 )
 
 type wordsBase struct {
-	items    []string
-	runeFreq map[rune]float64
+	items           []string
+	charsFreq       map[rune]int
+	itemFreqIndexes map[string]int
 }
 
 func loadBase(fileName string) (*wordsBase, error) {
@@ -18,24 +19,34 @@ func loadBase(fileName string) (*wordsBase, error) {
 	}
 
 	base := &wordsBase{
-		items:    strings.Split(string(b), "\n"),
-		runeFreq: make(map[rune]float64),
+		items:           strings.Split(string(b), "\n"),
+		charsFreq:       make(map[rune]int),
+		itemFreqIndexes: make(map[string]int),
 	}
 
-	chars := make(map[rune]int)
-	total := 0
-	for _, word := range base.items {
-		for _, r := range word {
-			chars[r]++
-			total++
-		}
-	}
-	if total == 0 {
+	if len(base.items) == 0 {
 		return nil, errors.New("empty base")
 	}
 
-	for c, n := range chars {
-		base.runeFreq[c] = float64(n) / float64(total)
+	wordChars := newCharSet()
+	for _, word := range base.items {
+		wordChars.clear()
+		for _, c := range word {
+			if !wordChars.has(c) {
+				base.charsFreq[c]++
+				wordChars.add(c)
+			}
+		}
+	}
+
+	for _, word := range base.items {
+		wordChars.clear()
+		for _, c := range word {
+			if !wordChars.has(c) {
+				base.itemFreqIndexes[word] += base.charsFreq[c]
+				wordChars.add(c)
+			}
+		}
 	}
 
 	return base, nil
