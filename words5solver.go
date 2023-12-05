@@ -82,7 +82,7 @@ func main() {
 		fmt.Printf("Words base loading error: %s\n", err)
 		return
 	}
-	fmt.Printf("Loaded words: %d\n\n", len(base.items))
+	fmt.Printf("Loaded words: %d\n\n", base.count())
 
 	filter := newWordFilter()
 	input := bufio.NewScanner(os.Stdin)

@@ -52,6 +52,10 @@ func loadBase(fileName string) (*wordsBase, error) {
 	return base, nil
 }
 
+func (b *wordsBase) count() int {
+	return len(b.items)
+}
+
 func (b *wordsBase) hasWord(word string) bool {
 	for _, w := range b.items {
 		if w == word {
