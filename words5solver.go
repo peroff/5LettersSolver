@@ -9,7 +9,7 @@ import (
 	"unicode/utf8"
 )
 
-const version = "0.3"
+const version = "0.4"
 
 const (
 	wordLen     = 5
@@ -74,7 +74,7 @@ func printWords(words []string) {
 }
 
 func main() {
-	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022\n", version)
+	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022-2023\n", version)
 	fmt.Println()
 
 	base, err := loadBase("words.txt")
