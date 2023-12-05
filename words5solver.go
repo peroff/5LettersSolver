@@ -39,7 +39,7 @@ func sortWordsByCharsFreq(words []string, base *wordsBase) {
 	sort.Sort(info)
 }
 
-func getFirstWord(base *wordsBase) string {
+func getStartWord(base *wordsBase) string {
 	words := make([]string, len(base.items))
 	copy(words, base.items)
 	sortWordsByCharsFreq(words, base)
@@ -88,9 +88,8 @@ func main() {
 	input := bufio.NewScanner(os.Stdin)
 
 	move := 1
-	currentWord := getFirstWord(base)
-	fmt.Printf("%d. Start with word: [%s]\n", move, currentWord)
-	waitingForResponse := true
+	currentWord := ""
+	waitingForResponse := false
 
 mainLp:
 	for {
@@ -98,7 +97,12 @@ mainLp:
 			fmt.Printf("%d. Enter app's response, 5 symbols: '+' - correct letter, '-' - wrong letter,\n", move)
 			fmt.Printf("   '.' - misplaced letter. Response (empty for exit): ")
 		} else {
-			fmt.Printf("%d. Enter your next word (same there and in the app): ", move)
+			if move == 1 {
+				fmt.Printf("%d. Enter your first word (recommended: \"%s\"): ",
+					move, getStartWord(base))
+			} else {
+				fmt.Printf("%d. Enter your next word (same there and in the app): ", move)
+			}
 		}
 
 		if !input.Scan() {
