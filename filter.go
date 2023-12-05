@@ -6,10 +6,10 @@ import (
 )
 
 type wordFilter struct {
-	deadChars  charSet
-	badChars   [wordLen]charSet
-	reqChars   charSet
-	fixedChars [wordLen]rune
+	deadChars  charSet          // буквы, которых точно нет в слове
+	badChars   [wordLen]charSet // буквы, которые не подходят для i-ой позиции
+	reqChars   charSet          // буквы, которые точно есть в слове
+	fixedChars [wordLen]rune    // отгаданные буквы (на своих позициях)
 }
 
 func (f *wordFilter) update(lastWord, answer string) error {
