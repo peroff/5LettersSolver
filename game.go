@@ -1,5 +1,13 @@
 package main
 
+const wordLen = 5
+
+const (
+	fixedCharAnsw = '+'
+	badCharAnsw   = '.'
+	deadCharAnsw  = '-'
+)
+
 // Предположительная функция генерации ответа игры (информации об угаданных
 // буквах). С ее учетом строится алгоритм фильтрации слов.
 func getGameAnswer(secret, try string) string {
@@ -24,14 +32,14 @@ func getGameAnswer(secret, try string) string {
 
 	for i, tc := range tryChars {
 		if tc == secretChars[i] {
-			answerChars[i] = '+'
+			answerChars[i] = fixedCharAnsw
 			openCharCount[tc]++
 		} else {
 			if openCharCount[tc] < secretCharCount[tc] {
-				answerChars[i] = '.'
+				answerChars[i] = badCharAnsw
 				openCharCount[tc]++
 			} else {
-				answerChars[i] = '-'
+				answerChars[i] = deadCharAnsw
 			}
 		}
 	}

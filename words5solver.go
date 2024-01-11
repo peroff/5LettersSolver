@@ -15,7 +15,6 @@ const (
 )
 
 const (
-	wordLen     = 5
 	maxWords    = 200
 	wordsInLine = 10
 )

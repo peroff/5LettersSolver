@@ -20,10 +20,10 @@ func (f *wordFilter) update(lastWord, answer string) error {
 	}
 	for i, curChar := range wordChars {
 		switch answChars[i] {
-		case '+':
+		case fixedCharAnsw:
 			f.fixedChars[i] = curChar
 			f.reqChars.add(curChar)
-		case '-':
+		case deadCharAnsw:
 			// минус может стоять если: 1) все вхождения данной буквы в слово
 			// уже подсвечены точками и плюсами ранее; 2) буквы совсем нет в слове
 			if f.reqChars.has(curChar) {
@@ -31,7 +31,7 @@ func (f *wordFilter) update(lastWord, answer string) error {
 			} else {
 				f.deadChars.add(curChar)
 			}
-		case '.':
+		case badCharAnsw:
 			f.badChars[i].add(curChar)
 			f.reqChars.add(curChar)
 		default:
