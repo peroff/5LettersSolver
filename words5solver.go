@@ -142,6 +142,7 @@ mainLp:
 			}
 			waitingForResponse = false
 		} else {
+			// TODO заменять Ё на Е + нижний регистр
 			if !base.hasWord(s) {
 				fmt.Printf("Unknown word \"%s\"\n\n", s)
 				continue

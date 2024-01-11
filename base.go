@@ -19,6 +19,7 @@ func loadBase(fileName string) (*wordsBase, error) {
 	}
 
 	base := &wordsBase{
+		// TODO заменять Ё на Е + нижний регистр
 		items:           strings.Split(string(b), "\n"),
 		charsFreq:       make(map[rune]int),
 		itemFreqIndexes: make(map[string]int),
