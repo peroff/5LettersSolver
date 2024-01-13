@@ -22,8 +22,15 @@ func (f *wordFilter) update(lastWord, answer string) error {
 		switch answChars[i] {
 		case '+':
 			f.fixedChars[i] = curChar
+			f.reqChars.add(curChar)
 		case '-':
-			f.deadChars.add(curChar)
+			// минус может стоять если: 1) все вхождения данной буквы в слово
+			// уже подсвечены точками и плюсами ранее; 2) буквы совсем нет в слове
+			if f.reqChars.has(curChar) {
+				f.badChars[i].add(curChar)
+			} else {
+				f.deadChars.add(curChar)
+			}
 		case '.':
 			f.badChars[i].add(curChar)
 			f.reqChars.add(curChar)
