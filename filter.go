@@ -13,42 +13,49 @@ type wordFilter struct {
 }
 
 func (f *wordFilter) update(lastWord, answer string) error {
-	lwChars := []rune(lastWord)
-	aChars := []rune(answer)
-	if len(lwChars) != wordLen || len(aChars) != wordLen {
+	wordChars := []rune(lastWord)
+	answChars := []rune(answer)
+	if len(wordChars) != wordLen || len(answChars) != wordLen {
 		return errors.New("wrong word length")
 	}
-	for i, lwc := range lwChars {
-		switch aChars[i] {
+	for i, curChar := range wordChars {
+		switch answChars[i] {
 		case '+':
-			f.fixedChars[i] = lwc
+			f.fixedChars[i] = curChar
+			f.reqChars.add(curChar)
 		case '-':
-			f.deadChars.add(lwc)
+			// минус может стоять если: 1) все вхождения данной буквы в слово
+			// уже подсвечены точками и плюсами ранее; 2) буквы совсем нет в слове
+			if f.reqChars.has(curChar) {
+				f.badChars[i].add(curChar)
+			} else {
+				f.deadChars.add(curChar)
+			}
 		case '.':
-			f.badChars[i].add(lwc)
-			f.reqChars.add(lwc)
+			f.badChars[i].add(curChar)
+			f.reqChars.add(curChar)
 		default:
-			return fmt.Errorf("unknown char \"%c\"", aChars[i])
+			return fmt.Errorf("unknown char \"%c\"", answChars[i])
 		}
 	}
 	return nil
 }
 
 func (f *wordFilter) checkWord(word string) bool {
-	chars := newCharSet()
-	for i, c := range []rune(word) {
-		if fc := f.fixedChars[i]; fc != 0 && c != fc {
+	wordChars := newCharSet()
+	for i, curChar := range []rune(word) {
+		if fixed := f.fixedChars[i]; fixed != 0 && curChar != fixed {
 			return false
 		}
-		if f.deadChars.has(c) {
+		if f.deadChars.has(curChar) {
 			return false
 		}
-		if f.badChars[i].has(c) {
+		if f.badChars[i].has(curChar) {
 			return false
 		}
-		chars.add(c)
+		wordChars.add(curChar)
 	}
-	if !chars.hasAll(f.reqChars) {
+	if !wordChars.hasAll(f.reqChars) {
 		return false
 	}
 	return true

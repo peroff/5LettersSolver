@@ -9,7 +9,10 @@ import (
 	"unicode/utf8"
 )
 
-const version = "0.4"
+const (
+	version = "0.5"
+	year    = "2024"
+)
 
 const (
 	wordLen     = 5
@@ -74,7 +77,7 @@ func printWords(words []string) {
 }
 
 func main() {
-	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022-2023\n", version)
+	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022-%s\n", version, year)
 	fmt.Println()
 
 	base, err := loadBase("words.txt")
@@ -142,6 +145,7 @@ mainLp:
 			}
 			waitingForResponse = false
 		} else {
+			s = strings.ReplaceAll(strings.ToLower(s), "ё", "е")
 			if !base.hasWord(s) {
 				fmt.Printf("Unknown word \"%s\"\n\n", s)
 				continue
