@@ -142,7 +142,7 @@ mainLp:
 			}
 			waitingForResponse = false
 		} else {
-			// TODO заменять Ё на Е + нижний регистр
+			s = strings.ReplaceAll(strings.ToLower(s), "ё", "е")
 			if !base.hasWord(s) {
 				fmt.Printf("Unknown word \"%s\"\n\n", s)
 				continue
