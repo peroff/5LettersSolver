@@ -27,17 +27,20 @@ func getGameAnswer(secret, try string) string {
 		secretCharCount[sc]++
 	}
 
-	// сколько раз каждую букву уже раскрыли текущим предположением
-	openCharCount := make(map[rune]int)
-
+	// сначала обозначаем угаданные буквы, уменьшая счетчик оставшихся в слове букв
 	for i, tc := range tryChars {
 		if tc == secretChars[i] {
 			answerChars[i] = fixedCharAnsw
-			openCharCount[tc]++
-		} else {
-			if openCharCount[tc] < secretCharCount[tc] {
+			secretCharCount[tc]--
+		}
+	}
+
+	// обозначаем буквы не на своих местах и отсутствующие, в зависимости от счетчика
+	for i, tc := range tryChars {
+		if tc != secretChars[i] {
+			if secretCharCount[tc] > 0 {
 				answerChars[i] = badCharAnsw
-				openCharCount[tc]++
+				secretCharCount[tc]--
 			} else {
 				answerChars[i] = deadCharAnsw
 			}
