@@ -6,67 +6,94 @@ import (
 )
 
 type wordFilter struct {
-	deadChars  charSet          // буквы, которых точно нет в слове
-	badChars   [wordLen]charSet // буквы, которые не подходят для i-ой позиции
-	reqChars   charSet          // буквы, которые точно есть в слове
 	fixedChars [wordLen]rune    // отгаданные буквы (на своих позициях)
+	badChars   [wordLen]charSet // буквы, которые не подходят для i-ой позиции
+	charCnt    map[rune]int     // точное число вхождений каждой известной буквы
+	minCharCnt map[rune]int     // минимально необходимое число вхождений каждой известной буквы
 }
 
-func (f *wordFilter) update(lastWord, answer string) error {
-	wordChars := []rune(lastWord)
-	answChars := []rune(answer)
-	if len(wordChars) != wordLen || len(answChars) != wordLen {
+func (f *wordFilter) update(try, answer string) error {
+	tryChars := []rune(try)
+	answerChars := []rune(answer)
+	if len(tryChars) != wordLen || len(answerChars) != wordLen {
 		return errors.New("wrong word length")
 	}
-	for i, curChar := range wordChars {
-		switch answChars[i] {
-		case fixedCharAnsw:
-			f.fixedChars[i] = curChar
-			f.reqChars.add(curChar)
-		case deadCharAnsw:
-			// минус может стоять если: 1) все вхождения данной буквы в слово
-			// уже подсвечены точками и плюсами ранее; 2) буквы совсем нет в слове
-			if f.reqChars.has(curChar) {
-				f.badChars[i].add(curChar)
-			} else {
-				f.deadChars.add(curChar)
-			}
-		case badCharAnsw:
-			f.badChars[i].add(curChar)
-			f.reqChars.add(curChar)
-		default:
-			return fmt.Errorf("unknown char \"%c\"", answChars[i])
+
+	openCharCnt := make(map[rune]int)
+
+	for i, ac := range answerChars {
+		if ac == fixedCharAnsw {
+			f.fixedChars[i] = tryChars[i]
+			openCharCnt[tryChars[i]]++
 		}
 	}
+
+	for i, ac := range answerChars {
+		switch ac {
+		case fixedCharAnsw:
+			// ничего не делаем
+		case badCharAnsw:
+			f.badChars[i].add(tryChars[i])
+			openCharCnt[tryChars[i]]++
+		case deadCharAnsw:
+			f.badChars[i].add(tryChars[i])
+			// Если нашли минус, значит ВСЕ вхождения данной буквы в загаданное
+			// слово (если они есть) обозначены в ответе в виде плюсов и точек,
+			// уже подсчитаны, и можно сделать вывод о фактическом их числе.
+			// Не может быть чтобы одна и та же буква сначала была минусом,
+			// а потом (правее) точкой.
+			f.charCnt[tryChars[i]] = openCharCnt[tryChars[i]]
+		default:
+			return fmt.Errorf("unknown char \"%c\"", ac)
+		}
+	}
+
+	for wc, cnt := range openCharCnt {
+		if cnt > f.minCharCnt[wc] {
+			f.minCharCnt[wc] = cnt
+		}
+	}
+
 	return nil
 }
 
 func (f *wordFilter) checkWord(word string) bool {
-	wordChars := newCharSet()
-	for i, curChar := range []rune(word) {
-		if fixed := f.fixedChars[i]; fixed != 0 && curChar != fixed {
-			return false
-		}
-		if f.deadChars.has(curChar) {
-			return false
-		}
-		if f.badChars[i].has(curChar) {
-			return false
-		}
-		wordChars.add(curChar)
+	wordChars := []rune(word)
+	if len(wordChars) != wordLen {
+		panic("wrong word length")
 	}
-	if !wordChars.hasAll(f.reqChars) {
-		return false
+
+	charCount := make(map[rune]int)
+
+	for i, wc := range wordChars {
+		if fixed := f.fixedChars[i]; fixed != 0 && wc != fixed {
+			return false
+		}
+		if f.badChars[i].has(wc) {
+			return false
+		}
+		charCount[wc]++
 	}
+
+	for wc, cnt := range charCount {
+		if actCnt, ok := f.charCnt[wc]; ok && cnt != actCnt {
+			return false
+		}
+		if min, ok := f.minCharCnt[wc]; ok && cnt < min {
+			return false
+		}
+	}
+
 	return true
 }
 
 func newWordFilter() *wordFilter {
-	f := &wordFilter{}
-	f.deadChars = newCharSet()
+	f := &wordFilter{
+		charCnt:    make(map[rune]int),
+		minCharCnt: make(map[rune]int),
+	}
 	for i := 0; i < wordLen; i++ {
 		f.badChars[i] = newCharSet()
 	}
-	f.reqChars = newCharSet()
 	return f
 }
