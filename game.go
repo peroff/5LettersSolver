@@ -10,6 +10,7 @@ const (
 
 // Предположительная функция генерации ответа игры (информации об угаданных
 // буквах). С ее учетом строится алгоритм фильтрации слов.
+// TODO rename answer -> responce
 func getGameAnswer(secret, try string) string {
 	// результат работы
 	answerChars := make([]rune, wordLen)

@@ -9,9 +9,12 @@ import (
 	"unicode/utf8"
 )
 
+// TODO review error handling
+// TODO base name const
+
 const (
-	version = "0.5"
-	year    = "2024"
+	version = "0.5"  // TODO rename
+	year    = "2024" // TODO rename
 )
 
 const (
