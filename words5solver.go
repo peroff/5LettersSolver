@@ -13,8 +13,8 @@ import (
 // TODO base name const
 
 const (
-	version = "0.5"  // TODO rename
-	year    = "2024" // TODO rename
+	releaseVersion = "0.5"
+	releaseYear    = "2024"
 )
 
 const (
@@ -79,7 +79,8 @@ func printWords(words []string) {
 }
 
 func main() {
-	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022-%s\n", version, year)
+	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022-%s\n",
+		releaseVersion, releaseYear)
 	fmt.Println()
 
 	base, err := loadBase("words.txt")
