@@ -10,7 +10,6 @@ import (
 )
 
 // TODO review error handling
-// TODO base name const
 
 const (
 	releaseVersion = "0.5"
@@ -18,6 +17,7 @@ const (
 )
 
 const (
+	wordsFile   = "words.txt"
 	maxWords    = 200
 	wordsInLine = 10
 )
@@ -83,7 +83,7 @@ func main() {
 		releaseVersion, releaseYear)
 	fmt.Println()
 
-	base, err := loadBase("words.txt")
+	base, err := loadBase(wordsFile)
 	if err != nil {
 		fmt.Printf("Words base loading error: %s\n", err)
 		return

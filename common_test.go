@@ -390,7 +390,7 @@ var testSessions = []gameSession{
 
 func init() {
 	var err error
-	base, err = loadBase("words.txt")
+	base, err = loadBase(wordsFile)
 	if err != nil {
 		panic(fmt.Sprintf("Words base loading error: %s", err))
 	}
