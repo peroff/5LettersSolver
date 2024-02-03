@@ -5,20 +5,20 @@ import (
 	"testing"
 )
 
-func TestGetGameAnswer(t *testing.T) {
+func TestGetGameResponse(t *testing.T) {
 	for _, ts := range testSessions {
 		for _, try := range ts.tries {
-			testTryAnswer(t, ts.secret, try.try, try.res)
+			testTryResponse(t, ts.secret, try.try, try.resp)
 		}
 
-		testTryAnswer(t, ts.secret, ts.secret, allFixedCharsAnsw)
-		testTryAnswer(t, ts.secret, strings.Repeat(" ", wordLen),
-			allDeadCharsAnsw)
+		testTryResponse(t, ts.secret, ts.secret, allFixedCharsResp)
+		testTryResponse(t, ts.secret, strings.Repeat(" ", wordLen),
+			allDeadCharsResp)
 	}
 }
 
-func testTryAnswer(t *testing.T, secret, try, want string) {
-	if res := getGameAnswer(secret, try); res != want {
-		t.Fatalf("%q, %q: want %q, got %q", secret, try, want, res)
+func testTryResponse(t *testing.T, secret, try, want string) {
+	if resp := getGameResponse(secret, try); resp != want {
+		t.Fatalf("%q, %q: want %q, got %q", secret, try, want, resp)
 	}
 }

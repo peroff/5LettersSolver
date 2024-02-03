@@ -12,30 +12,30 @@ type wordFilter struct {
 	minCharCnt map[rune]int     // минимально необходимое число вхождений каждой известной буквы
 }
 
-func (f *wordFilter) update(try, answer string) error {
+func (f *wordFilter) update(try, response string) error {
 	tryChars := []rune(try)
-	answerChars := []rune(answer)
-	if len(tryChars) != wordLen || len(answerChars) != wordLen {
+	respChars := []rune(response)
+	if len(tryChars) != wordLen || len(respChars) != wordLen {
 		return errors.New("wrong word length")
 	}
 
 	openCharCnt := make(map[rune]int)
 
-	for i, ac := range answerChars {
-		if ac == fixedCharAnsw {
+	for i, rc := range respChars {
+		if rc == fixedCharResp {
 			f.fixedChars[i] = tryChars[i]
 			openCharCnt[tryChars[i]]++
 		}
 	}
 
-	for i, ac := range answerChars {
-		switch ac {
-		case fixedCharAnsw:
+	for i, rc := range respChars {
+		switch rc {
+		case fixedCharResp:
 			// ничего не делаем
-		case badCharAnsw:
+		case badCharResp:
 			f.badChars[i].add(tryChars[i])
 			openCharCnt[tryChars[i]]++
-		case deadCharAnsw:
+		case deadCharResp:
 			f.badChars[i].add(tryChars[i])
 			// Если нашли минус, значит ВСЕ вхождения данной буквы в загаданное
 			// слово (если они есть) обозначены в ответе в виде плюсов и точек,
@@ -44,7 +44,7 @@ func (f *wordFilter) update(try, answer string) error {
 			// а потом (правее) точкой.
 			f.charCnt[tryChars[i]] = openCharCnt[tryChars[i]]
 		default:
-			return fmt.Errorf("unknown char \"%c\"", ac)
+			return fmt.Errorf("unknown char \"%c\"", rc)
 		}
 	}
 

@@ -3,17 +3,16 @@ package main
 const wordLen = 5
 
 const (
-	fixedCharAnsw = '+'
-	badCharAnsw   = '.'
-	deadCharAnsw  = '-'
+	fixedCharResp = '+'
+	badCharResp   = '.'
+	deadCharResp  = '-'
 )
 
 // Предположительная функция генерации ответа игры (информации об угаданных
 // буквах). С ее учетом строится алгоритм фильтрации слов.
-// TODO rename answer -> responce
-func getGameAnswer(secret, try string) string {
+func getGameResponse(secret, try string) string {
 	// результат работы
-	answerChars := make([]rune, wordLen)
+	respChars := make([]rune, wordLen)
 
 	// массивы символов загаданного слова и предположения
 	secretChars := []rune(secret)
@@ -31,7 +30,7 @@ func getGameAnswer(secret, try string) string {
 	// сначала обозначаем угаданные буквы, уменьшая счетчик оставшихся в слове букв
 	for i, tc := range tryChars {
 		if tc == secretChars[i] {
-			answerChars[i] = fixedCharAnsw
+			respChars[i] = fixedCharResp
 			secretCharCount[tc]--
 		}
 	}
@@ -40,13 +39,13 @@ func getGameAnswer(secret, try string) string {
 	for i, tc := range tryChars {
 		if tc != secretChars[i] {
 			if secretCharCount[tc] > 0 {
-				answerChars[i] = badCharAnsw
+				respChars[i] = badCharResp
 				secretCharCount[tc]--
 			} else {
-				answerChars[i] = deadCharAnsw
+				respChars[i] = deadCharResp
 			}
 		}
 	}
 
-	return string(answerChars)
+	return string(respChars)
 }

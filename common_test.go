@@ -6,16 +6,16 @@ import (
 )
 
 var (
-	allFixedCharsAnsw = strings.Repeat(string(fixedCharAnsw), wordLen)
-	allBadCharsAnsw   = strings.Repeat(string(badCharAnsw), wordLen)
-	allDeadCharsAnsw  = strings.Repeat(string(deadCharAnsw), wordLen)
+	allFixedCharsResp = strings.Repeat(string(fixedCharResp), wordLen)
+	allBadCharsResp   = strings.Repeat(string(badCharResp), wordLen)
+	allDeadCharsResp  = strings.Repeat(string(deadCharResp), wordLen)
 )
 
 var base *wordsBase
 
 type gameTry struct {
-	try string
-	res string
+	try  string
+	resp string
 }
 
 type gameSession struct {

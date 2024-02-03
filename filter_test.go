@@ -24,11 +24,11 @@ func TestWordFilter(t *testing.T) {
 		passedWords := base.count()
 
 		for _, try := range ts.tries {
-			testTryWordFilter(t, filter, ts.secret, try.try, try.res,
+			testTryWordFilter(t, filter, ts.secret, try.try, try.resp,
 				&passedWords)
 		}
 
-		testTryWordFilter(t, filter, ts.secret, ts.secret, allFixedCharsAnsw,
+		testTryWordFilter(t, filter, ts.secret, ts.secret, allFixedCharsResp,
 			&passedWords)
 
 		for _, w := range base.items {
