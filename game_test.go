@@ -5,6 +5,8 @@ import (
 	"testing"
 )
 
+var nonExistentWord = strings.Repeat(" ", wordLen)
+
 func TestGetGameResponse(t *testing.T) {
 	for _, ts := range testSessions {
 		for _, try := range ts.tries {
@@ -12,8 +14,7 @@ func TestGetGameResponse(t *testing.T) {
 		}
 
 		testTryResponse(t, ts.secret, ts.secret, allFixedCharsResp)
-		testTryResponse(t, ts.secret, strings.Repeat(" ", wordLen),
-			allDeadCharsResp)
+		testTryResponse(t, ts.secret, nonExistentWord, allDeadCharsResp)
 	}
 }
 
