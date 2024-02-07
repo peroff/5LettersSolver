@@ -152,6 +152,9 @@ mainLp:
 				printWords(words)
 				fmt.Println()
 			}
+
+			// fmt.Printf("%s\n\n", filter)
+
 			waitingForResponse = false
 		} else {
 			s = strings.ReplaceAll(strings.ToLower(s), "ё", "е")

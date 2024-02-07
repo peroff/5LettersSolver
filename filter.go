@@ -77,11 +77,14 @@ func (f *wordFilter) checkWord(word string) (bool, error) {
 		charCount[wc]++
 	}
 
-	for wc, cnt := range charCount {
-		if actCnt, ok := f.charCnt[wc]; ok && cnt != actCnt {
+	for c, min := range f.minCharCnt {
+		if charCount[c] < min {
 			return false, nil
 		}
-		if min, ok := f.minCharCnt[wc]; ok && cnt < min {
+	}
+
+	for c, cnt := range f.charCnt {
+		if charCount[c] != cnt {
 			return false, nil
 		}
 	}
