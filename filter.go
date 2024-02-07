@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"sort"
 )
 
 type wordFilter struct {
@@ -86,6 +87,56 @@ func (f *wordFilter) checkWord(word string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (f *wordFilter) String() string {
+	fixed := ""
+	for _, f := range f.fixedChars {
+		if f != 0 {
+			fixed += string(f)
+		} else {
+			fixed += "_"
+		}
+	}
+
+	bad := ""
+	for i, b := range f.badChars {
+		if i < wordLen-1 {
+			bad += b.String() + ", "
+		} else {
+			bad += b.String()
+		}
+	}
+
+	min := charCntToStr(f.minCharCnt)
+
+	cnt := charCntToStr(f.charCnt)
+
+	return fmt.Sprintf("fixed: \"%s\"; bad: %s; min: %s; cnt: %s",
+		fixed, bad, min, cnt)
+}
+
+func charCntToStr(cnt map[rune]int) string {
+	if len(cnt) == 0 {
+		return ""
+	}
+
+	chars := make([]rune, 0, len(cnt))
+	for c, _ := range cnt {
+		chars = append(chars, c)
+	}
+	sort.Slice(chars, func(i, j int) bool { return chars[i] < chars[j] })
+
+	s := ""
+	for i, c := range chars {
+		if i < len(chars)-1 {
+			s += fmt.Sprintf("%c:%d, ", c, cnt[c])
+		} else {
+			s += fmt.Sprintf("%c:%d", c, cnt[c])
+		}
+	}
+
+	return s
 }
 
 func newWordFilter() *wordFilter {
