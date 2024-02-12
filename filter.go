@@ -57,34 +57,35 @@ func (f *wordFilter) update(try, response string) error {
 	return nil
 }
 
-func (f *wordFilter) checkWord(word string) bool {
+func (f *wordFilter) checkWord(word string) (bool, error) {
 	wordChars := []rune(word)
 	if len(wordChars) != wordLen {
-		panic("wrong word length")
+		return false, fmt.Errorf("wrong word length: %q (%d)",
+			word, len(wordChars))
 	}
 
 	charCount := make(map[rune]int)
 
 	for i, wc := range wordChars {
 		if fixed := f.fixedChars[i]; fixed != 0 && wc != fixed {
-			return false
+			return false, nil
 		}
 		if f.badChars[i].has(wc) {
-			return false
+			return false, nil
 		}
 		charCount[wc]++
 	}
 
 	for wc, cnt := range charCount {
 		if actCnt, ok := f.charCnt[wc]; ok && cnt != actCnt {
-			return false
+			return false, nil
 		}
 		if min, ok := f.minCharCnt[wc]; ok && cnt < min {
-			return false
+			return false, nil
 		}
 	}
 
-	return true
+	return true, nil
 }
 
 func newWordFilter() *wordFilter {

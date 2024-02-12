@@ -52,15 +52,19 @@ func getStartWord(base *wordsBase) string {
 	return words[0]
 }
 
-func selectWords(base *wordsBase, filter *wordFilter) []string {
+func selectWords(base *wordsBase, filter *wordFilter) ([]string, error) {
 	res := []string{}
 	for _, word := range base.items {
-		if filter.checkWord(word) {
+		ok, err := filter.checkWord(word)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
 			res = append(res, word)
 		}
 	}
 	sortWordsByCharsFreq(res, base)
-	return res
+	return res, nil
 }
 
 func printWords(words []string) {
@@ -129,7 +133,11 @@ mainLp:
 				continue
 			}
 			move++
-			words := selectWords(base, filter)
+			words, err := selectWords(base, filter)
+			if err != nil {
+				fmt.Printf("Oops! Internal error: %s\n", err)
+				os.Exit(1)
+			}
 			switch len(words) {
 			case 0:
 				fmt.Printf("\nNo possible words found :( Sorry...\n\n")
