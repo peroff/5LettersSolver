@@ -86,7 +86,7 @@ func main() {
 	base, err := loadBase(wordsFile)
 	if err != nil {
 		fmt.Printf("Words base loading error: %s\n", err)
-		return
+		os.Exit(1)
 	}
 	fmt.Printf("Loaded words: %d\n\n", base.count())
 
