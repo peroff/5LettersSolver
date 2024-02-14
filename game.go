@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 const wordLen = 5
 
 const (
@@ -10,15 +12,20 @@ const (
 
 // Предположительная функция генерации ответа игры (информации об угаданных
 // буквах). С ее учетом строится алгоритм фильтрации слов.
-func getGameResponse(secret, try string) string {
+func getGameResponse(secret, try string) (string, error) {
 	// результат работы
 	respChars := make([]rune, wordLen)
 
 	// массивы символов загаданного слова и предположения
 	secretChars := []rune(secret)
+	if len(secretChars) != wordLen {
+		return "", fmt.Errorf("wrong word length: %q (%d)",
+			secret, len(secretChars))
+	}
 	tryChars := []rune(try)
-	if len(secretChars) != wordLen || len(tryChars) != wordLen {
-		panic("bad word length")
+	if len(tryChars) != wordLen {
+		return "", fmt.Errorf("wrong word length: %q (%d)",
+			try, len(tryChars))
 	}
 
 	// число вхождений каждой буквы в загаданное слово
@@ -47,5 +54,5 @@ func getGameResponse(secret, try string) string {
 		}
 	}
 
-	return string(respChars)
+	return string(respChars), nil
 }

@@ -9,8 +9,6 @@ import (
 	"unicode/utf8"
 )
 
-// TODO review error handling
-
 const (
 	releaseVersion = "0.5"
 	releaseYear    = "2024"

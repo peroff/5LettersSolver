@@ -19,7 +19,11 @@ func TestGetGameResponse(t *testing.T) {
 }
 
 func testTryResponse(t *testing.T, secret, try, want string) {
-	if resp := getGameResponse(secret, try); resp != want {
+	resp, err := getGameResponse(secret, try)
+	if err != nil {
+		t.Fatalf("Error: %s", err)
+	}
+	if resp != want {
 		t.Fatalf("%q, %q: want %q, got %q", secret, try, want, resp)
 	}
 }
