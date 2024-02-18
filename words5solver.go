@@ -43,11 +43,7 @@ func sortWordsByCharsFreq(words []string, base *wordsBase) {
 }
 
 func getStartWord(base *wordsBase) string {
-	words := make([]string, len(base.items))
-	copy(words, base.items)
-	sortWordsByCharsFreq(words, base)
-	// printWords(words)
-	return words[0]
+	return "норка"
 }
 
 func selectWords(base *wordsBase, filter *wordFilter) ([]string, error) {
