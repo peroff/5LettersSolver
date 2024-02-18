@@ -43,10 +43,7 @@ func TestWordFilter(t *testing.T) {
 func testTryWordFilter(t *testing.T, filter *wordFilter, secret, try,
 	resp string, passedWords *int) {
 
-	err := filter.update(try, resp)
-	if err != nil {
-		t.Fatalf("filter update error: %s", err)
-	}
+	updateFilter(t, filter, try, resp)
 
 	if !checkWord(t, filter, secret) {
 		t.Fatalf("word %q doesn't pass filter after try %q", secret, try)
@@ -59,6 +56,13 @@ func testTryWordFilter(t *testing.T, filter *wordFilter, secret, try,
 			"Secret: %q, try: %q", *passedWords, p, secret, try)
 	}
 	*passedWords = p
+}
+
+func updateFilter(t *testing.T, filter *wordFilter, try, resp string) {
+	err := filter.update(try, resp)
+	if err != nil {
+		t.Fatalf("filter update error: %s", err)
+	}
 }
 
 func checkWord(t *testing.T, filter *wordFilter, word string) bool {
@@ -125,12 +129,5 @@ func TestWordFilterNegatives(t *testing.T) {
 			t.Fatalf("wrong word passed: %q (after %q, %q)",
 				c.test, c.try, c.resp)
 		}
-	}
-}
-
-func updateFilter(t *testing.T, filter *wordFilter, try, resp string) {
-	err := filter.update(try, resp)
-	if err != nil {
-		t.Fatalf("filter update error: %s", err)
 	}
 }
