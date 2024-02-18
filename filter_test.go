@@ -40,10 +40,10 @@ func TestWordFilter(t *testing.T) {
 	}
 }
 
-func testTryWordFilter(t *testing.T, filter *wordFilter, secret, try, res string,
-	passedWords *int) {
+func testTryWordFilter(t *testing.T, filter *wordFilter, secret, try,
+	resp string, passedWords *int) {
 
-	err := filter.update(try, res)
+	err := filter.update(try, resp)
 	if err != nil {
 		t.Fatalf("filter update error: %s", err)
 	}
@@ -64,7 +64,7 @@ func testTryWordFilter(t *testing.T, filter *wordFilter, secret, try, res string
 func checkWord(t *testing.T, filter *wordFilter, word string) bool {
 	ok, err := filter.checkWord(word)
 	if err != nil {
-		t.Fatalf("Error: %s", err)
+		t.Fatalf("word checking error: %s", err)
 	}
 	return ok
 }
