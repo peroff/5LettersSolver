@@ -10,12 +10,12 @@ import (
 )
 
 const (
-	version = "0.5"
-	year    = "2024"
+	releaseVersion = "0.6"
+	releaseYear    = "2024"
 )
 
 const (
-	wordLen     = 5
+	wordsFile   = "words.txt"
 	maxWords    = 200
 	wordsInLine = 10
 )
@@ -43,22 +43,22 @@ func sortWordsByCharsFreq(words []string, base *wordsBase) {
 }
 
 func getStartWord(base *wordsBase) string {
-	words := make([]string, len(base.items))
-	copy(words, base.items)
-	sortWordsByCharsFreq(words, base)
-	// printWords(words)
-	return words[0]
+	return "норка"
 }
 
-func selectWords(base *wordsBase, filter *wordFilter) []string {
+func selectWords(base *wordsBase, filter *wordFilter) ([]string, error) {
 	res := []string{}
 	for _, word := range base.items {
-		if filter.checkWord(word) {
+		ok, err := filter.checkWord(word)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
 			res = append(res, word)
 		}
 	}
 	sortWordsByCharsFreq(res, base)
-	return res
+	return res, nil
 }
 
 func printWords(words []string) {
@@ -77,13 +77,14 @@ func printWords(words []string) {
 }
 
 func main() {
-	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022-%s\n", version, year)
+	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022-%s\n",
+		releaseVersion, releaseYear)
 	fmt.Println()
 
-	base, err := loadBase("words.txt")
+	base, err := loadBase(wordsFile)
 	if err != nil {
 		fmt.Printf("Words base loading error: %s\n", err)
-		return
+		os.Exit(1)
 	}
 	fmt.Printf("Loaded words: %d\n\n", base.count())
 
@@ -126,7 +127,11 @@ mainLp:
 				continue
 			}
 			move++
-			words := selectWords(base, filter)
+			words, err := selectWords(base, filter)
+			if err != nil {
+				fmt.Printf("Oops! Internal error: %s\n", err)
+				os.Exit(1)
+			}
 			switch len(words) {
 			case 0:
 				fmt.Printf("\nNo possible words found :( Sorry...\n\n")
@@ -143,6 +148,9 @@ mainLp:
 				printWords(words)
 				fmt.Println()
 			}
+
+			// fmt.Printf("%s\n\n", filter)
+
 			waitingForResponse = false
 		} else {
 			s = strings.ReplaceAll(strings.ToLower(s), "ё", "е")

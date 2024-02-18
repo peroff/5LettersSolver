@@ -1,5 +1,10 @@
 package main
 
+import (
+	"fmt"
+	"sort"
+)
+
 type charSet map[rune]struct{}
 
 func (cs charSet) clear() {
@@ -24,6 +29,29 @@ func (cs charSet) hasAll(chars charSet) bool {
 		}
 	}
 	return true
+}
+
+func (cs charSet) String() string {
+	if len(cs) == 0 {
+		return "[]"
+	}
+
+	chars := make([]rune, 0, len(cs))
+	for c, _ := range cs {
+		chars = append(chars, c)
+	}
+	sort.Slice(chars, func(i, j int) bool { return chars[i] < chars[j] })
+
+	s := "["
+	for i, c := range chars {
+		if i < len(chars)-1 {
+			s += fmt.Sprintf("%c, ", c)
+		} else {
+			s += fmt.Sprintf("%c]", c)
+		}
+	}
+
+	return s
 }
 
 func newCharSet() charSet {
