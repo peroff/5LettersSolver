@@ -79,3 +79,58 @@ func getPassedWords(t *testing.T, filter *wordFilter) int {
 
 	return n
 }
+
+func TestWordFilterNegatives(t *testing.T) {
+	var cases = []struct {
+		try  string
+		resp string
+		test string
+	}{
+		{
+			"azzzz",
+			"+----",
+			"zcccc",
+		},
+		{
+			"azzzz",
+			".----",
+			"acccc",
+		},
+		{
+			"azzzz",
+			"-----",
+			"acccc",
+		},
+		{
+			"azzzz",
+			".----",
+			"ccccc",
+		},
+		{
+			"aazzz",
+			".----",
+			"ccccc",
+		},
+		{
+			"aazzz",
+			".----",
+			"cccaa",
+		},
+	}
+
+	for _, c := range cases {
+		filter := newWordFilter()
+		updateFilter(t, filter, c.try, c.resp)
+		if checkWord(t, filter, c.test) {
+			t.Fatalf("wrong word passed: %q (after %q, %q)",
+				c.test, c.try, c.resp)
+		}
+	}
+}
+
+func updateFilter(t *testing.T, filter *wordFilter, try, resp string) {
+	err := filter.update(try, resp)
+	if err != nil {
+		t.Fatalf("filter update error: %s", err)
+	}
+}
