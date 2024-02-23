@@ -19,12 +19,12 @@ func getGameResponse(secret, try string) (string, error) {
 	// массивы символов загаданного слова и предположения
 	secretChars := []rune(secret)
 	if len(secretChars) != wordLen {
-		return "", fmt.Errorf("неверная длина слова: %q (%d)",
+		return "", fmt.Errorf("неверная длина слова: \"%s\" (%d)",
 			secret, len(secretChars))
 	}
 	tryChars := []rune(try)
 	if len(tryChars) != wordLen {
-		return "", fmt.Errorf("неверная длина слова: %q (%d)",
+		return "", fmt.Errorf("неверная длина слова: \"%s\" (%d)",
 			try, len(tryChars))
 	}
 

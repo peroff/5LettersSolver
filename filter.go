@@ -61,7 +61,7 @@ func (f *wordFilter) update(try, response string) error {
 func (f *wordFilter) checkWord(word string) (bool, error) {
 	wordChars := []rune(word)
 	if len(wordChars) != wordLen {
-		return false, fmt.Errorf("неверная длина слова: %q (%d)",
+		return false, fmt.Errorf("неверная длина слова: \"%s\" (%d)",
 			word, len(wordChars))
 	}
 
