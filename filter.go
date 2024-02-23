@@ -17,7 +17,7 @@ func (f *wordFilter) update(try, response string) error {
 	tryChars := []rune(try)
 	respChars := []rune(response)
 	if len(tryChars) != wordLen || len(respChars) != wordLen {
-		return errors.New("wrong word length")
+		return errors.New("неверная длина слова")
 	}
 
 	openCharCnt := make(map[rune]int)
@@ -45,7 +45,7 @@ func (f *wordFilter) update(try, response string) error {
 			// а потом (правее) точкой.
 			f.charCnt[tryChars[i]] = openCharCnt[tryChars[i]]
 		default:
-			return fmt.Errorf("unknown char \"%c\"", rc)
+			return fmt.Errorf("неизвестный символ \"%c\"", rc)
 		}
 	}
 
@@ -61,7 +61,7 @@ func (f *wordFilter) update(try, response string) error {
 func (f *wordFilter) checkWord(word string) (bool, error) {
 	wordChars := []rune(word)
 	if len(wordChars) != wordLen {
-		return false, fmt.Errorf("wrong word length: %q (%d)",
+		return false, fmt.Errorf("неверная длина слова: %q (%d)",
 			word, len(wordChars))
 	}
 

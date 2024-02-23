@@ -25,7 +25,7 @@ func loadBase(fileName string) (*wordsBase, error) {
 	for i := range words {
 		words[i] = strings.TrimSpace(words[i])
 		if wlen := utf8.RuneCountInString(words[i]); wlen != wordLen {
-			return nil, fmt.Errorf("wrong word length: %q (%d)", words[i], wlen)
+			return nil, fmt.Errorf("неверная длина слова: %q (%d)", words[i], wlen)
 		}
 	}
 
@@ -36,7 +36,7 @@ func loadBase(fileName string) (*wordsBase, error) {
 	}
 
 	if len(base.items) == 0 {
-		return nil, errors.New("empty base")
+		return nil, errors.New("в файле нет ни одного слова")
 	}
 
 	wordChars := newCharSet()
