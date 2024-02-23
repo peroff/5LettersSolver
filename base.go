@@ -2,7 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"strings"
 	"unicode/utf8"
@@ -25,7 +24,7 @@ func loadBase(fileName string) (*wordsBase, error) {
 	for i := range words {
 		words[i] = strings.TrimSpace(words[i])
 		if wlen := utf8.RuneCountInString(words[i]); wlen != wordLen {
-			return nil, fmt.Errorf("неверная длина слова: \"%s\" (%d)", words[i], wlen)
+			return nil, wordLenError(words[i])
 		}
 	}
 
