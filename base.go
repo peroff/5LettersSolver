@@ -19,7 +19,7 @@ func loadBase(fileName string) (*wordsBase, error) {
 		return nil, err
 	}
 
-	text := strings.ReplaceAll(strings.ToLower(string(b)), "ё", "е")
+	text := normalizeWord(string(b))
 	words := strings.Split(text, "\n")
 	for i := range words {
 		words[i] = strings.TrimSpace(words[i])

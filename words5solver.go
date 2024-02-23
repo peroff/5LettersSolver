@@ -154,7 +154,7 @@ mainLp:
 
 			waitingForResponse = false
 		} else {
-			s = strings.ReplaceAll(strings.ToLower(s), "ё", "е")
+			s = normalizeWord(s)
 			if !base.hasWord(s) {
 				fmt.Printf("Неизвестное слово \"%s\"\n\n", s)
 				continue
