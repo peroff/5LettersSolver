@@ -92,6 +92,15 @@ func (f *wordFilter) checkWord(word string) (bool, error) {
 	return true, nil
 }
 
+func (f *wordFilter) clear() {
+	for i := 0; i < wordLen; i++ {
+		f.fixedChars[i] = 0
+		f.badChars[i].clear()
+	}
+	f.minCharCnt.clear()
+	f.charCnt.clear()
+}
+
 func (f *wordFilter) String() string {
 	fixed := ""
 	for _, f := range f.fixedChars {

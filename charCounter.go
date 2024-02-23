@@ -33,3 +33,9 @@ func (cc charCounter) String() string {
 
 	return s
 }
+
+func (cc charCounter) clear() {
+	for c := range cc {
+		delete(cc, c)
+	}
+}
