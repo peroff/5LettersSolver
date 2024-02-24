@@ -13,6 +13,36 @@ func TestEmptyWordFilter(t *testing.T) {
 	}
 }
 
+func TestWordFilterClear(t *testing.T) {
+	filter := newWordFilter()
+	testWordFilterClearCase(t, filter, "abcde", "+++++")
+	testWordFilterClearCase(t, filter, "abcde", ".....")
+	testWordFilterClearCase(t, filter, "abcde", "-----")
+	testWordFilterClearCase(t, filter, "abcde", "+-+-+")
+	testWordFilterClearCase(t, filter, "abcde", "-.-.-")
+	testWordFilterClearCase(t, filter, "abcde", ".+.+.")
+}
+
+func testWordFilterClearCase(t *testing.T, filter *wordFilter, try, resp string) {
+	updateFilter(t, filter, try, resp)
+	filter.clear()
+
+	for i := 0; i < wordLen; i++ {
+		if filter.fixedChars[i] != 0 {
+			t.Fatalf("fixedChars[%d] isn't zero after clear()", i)
+		}
+		if filter.badChars[i].count() != 0 {
+			t.Fatalf("badChars[%d] isn't empty after clear()", i)
+		}
+	}
+	if filter.minCharCnt.count() != 0 {
+		t.Fatalf("minCharCnt isn't empty after clear()")
+	}
+	if filter.charCnt.count() != 0 {
+		t.Fatalf("charCnt isn't empty after clear()")
+	}
+}
+
 func TestWordFilter(t *testing.T) {
 	for _, ts := range testSessions {
 		filter := newWordFilter()

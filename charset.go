@@ -17,6 +17,10 @@ func (cs charSet) add(char rune) {
 	cs[char] = struct{}{}
 }
 
+func (cs charSet) count() int {
+	return len(cs)
+}
+
 func (cs charSet) has(char rune) bool {
 	_, ok := cs[char]
 	return ok

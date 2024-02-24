@@ -39,3 +39,7 @@ func (cc charCounter) clear() {
 		delete(cc, c)
 	}
 }
+
+func (cc charCounter) count() int {
+	return len(cc)
+}
