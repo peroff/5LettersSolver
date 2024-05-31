@@ -3,14 +3,16 @@ package main
 import (
 	"errors"
 	"io/ioutil"
+	"os"
+	"sort"
 	"strings"
 	"unicode/utf8"
 )
 
 type wordsBase struct {
 	items           []string
-	charsFreq       map[rune]int
-	itemFreqIndexes map[string]int
+	charsFreq       map[rune]int   // в скольки словах встречается каждая буква
+	itemFreqIndexes map[string]int // сумма частот букв для каждого слова
 }
 
 func loadBase(fileName string) (*wordsBase, error) {
@@ -73,4 +75,23 @@ func (b *wordsBase) hasWord(word string) bool {
 		}
 	}
 	return false
+}
+
+func (b *wordsBase) save(fileName string) error {
+	f, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	words := make([]string, b.count())
+	copy(words, b.items)
+	sort.Strings(words)
+	_, err = f.WriteString(strings.Join(words, "\r\n"))
+	if err != nil {
+		os.Remove(fileName)
+		return err
+	}
+
+	return nil
 }
