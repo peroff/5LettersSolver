@@ -94,16 +94,18 @@ func main() {
 
 	move := 1
 	currentWord := ""
+	defaultWord := getStartWord(base)
 	waitingForResponse := false
 
 mainLp:
 	for {
 		if !waitingForResponse {
 			if move == 1 {
-				fmt.Printf("%d. Введите слово, с которого начинаем (рекомендуется: \"%s\"): ",
-					move, getStartWord(base))
+				fmt.Printf("%d. Введите слово, с которого начинаем (по умолчанию: \"%s\"): ",
+					move, defaultWord)
 			} else {
-				fmt.Printf("%d. Введите выбранное вами слово (затем его же в приложении): ", move)
+				fmt.Printf("%d. Введите выбранное вами слово (по умолчанию: \"%s\"): ",
+					move, defaultWord)
 			}
 		} else {
 			fmt.Printf("%d. Введите ответ приложения (5 символов: '+' - буква отгадана,\n"+
@@ -115,7 +117,11 @@ mainLp:
 		}
 		s := strings.TrimSpace(input.Text())
 		if s == "" {
-			break
+			if !waitingForResponse {
+				s = defaultWord
+			} else {
+				break
+			}
 		}
 		if strings.HasPrefix(s, removingCmd) {
 			removeWordsFromBase(base, strings.TrimPrefix(s, removingCmd))
@@ -152,6 +158,7 @@ mainLp:
 				fmt.Printf("\n%d. Возможные слова:\n", move)
 				printWords(words)
 				fmt.Println()
+				defaultWord = words[0]
 			}
 
 			// fmt.Printf("%s\n\n", filter)
