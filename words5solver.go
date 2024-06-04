@@ -18,6 +18,7 @@ const (
 	wordsFile   = "words.txt"
 	maxWords    = 200
 	wordsInLine = 10
+	removingCmd = "!!!" // префикс, активирующий функцию удаления слов из базы, например можно ввести: "!!! ёпрст"
 )
 
 type wordsInfo struct {
@@ -117,6 +118,10 @@ mainLp:
 		if s == "" {
 			break
 		}
+		if strings.HasPrefix(s, removingCmd) {
+			removeWordsFromBase(base, strings.TrimPrefix(s, removingCmd))
+			continue
+		}
 		if utf8.RuneCountInString(s) != wordLen {
 			fmt.Printf("Неверное число символов\n\n")
 			continue
@@ -166,4 +171,29 @@ mainLp:
 	if err := input.Err(); err != nil {
 		panic(fmt.Sprintf("input scanning error: %s", err))
 	}
+}
+
+func removeWordsFromBase(base *wordsBase, words string) {
+	n := 0
+	for _, w := range strings.Split(normalizeWord(words), " ") {
+		w = strings.TrimSpace(w)
+		if w == "" {
+			continue
+		}
+		if base.removeWord(w) {
+			fmt.Printf("%s Удалено: \"%s\"\n", removingCmd, w)
+			n++
+		} else {
+			fmt.Printf("%s Не найдено: \"%s\"\n", removingCmd, w)
+		}
+	}
+
+	err := base.save(wordsFile)
+	if err != nil {
+		fmt.Printf("%s Ошибка сохранения базы: %s\n", removingCmd, err)
+		return
+	}
+
+	fmt.Printf("%s Успешно удалено слов: %d\n", removingCmd, n)
+	fmt.Println()
 }
