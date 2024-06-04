@@ -113,7 +113,7 @@ mainLp:
 		}
 
 		if !input.Scan() {
-			break
+			break // ошибка
 		}
 		s := strings.TrimSpace(input.Text())
 		if s == "" {
@@ -123,16 +123,26 @@ mainLp:
 				break
 			}
 		}
+
 		if strings.HasPrefix(s, removingCmd) {
 			removeWordsFromBase(base, strings.TrimPrefix(s, removingCmd))
 			continue
 		}
+
 		if utf8.RuneCountInString(s) != wordLen {
 			fmt.Printf("Неверное число символов\n\n")
 			continue
 		}
 
-		if waitingForResponse {
+		if !waitingForResponse {
+			s = normalizeWord(s)
+			if !base.hasWord(s) {
+				fmt.Printf("Неизвестное слово \"%s\"\n\n", s)
+				continue
+			}
+			currentWord = s
+			waitingForResponse = true
+		} else {
 			if err := filter.update(currentWord, s); err != nil {
 				fmt.Printf("Некорректный ответ: %s\n\n", err)
 				continue
@@ -161,17 +171,7 @@ mainLp:
 				defaultWord = words[0]
 			}
 
-			// fmt.Printf("%s\n\n", filter)
-
 			waitingForResponse = false
-		} else {
-			s = normalizeWord(s)
-			if !base.hasWord(s) {
-				fmt.Printf("Неизвестное слово \"%s\"\n\n", s)
-				continue
-			}
-			currentWord = s
-			waitingForResponse = true
 		}
 	}
 	if err := input.Err(); err != nil {
