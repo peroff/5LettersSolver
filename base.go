@@ -77,6 +77,18 @@ func (b *wordsBase) hasWord(word string) bool {
 	return false
 }
 
+func (b *wordsBase) removeWord(word string) bool {
+	for i := range b.items {
+		if b.items[i] == word {
+			l := len(b.items)
+			copy(b.items[i:l-1], b.items[i+1:l])
+			b.items = b.items[:l-1]
+			return true
+		}
+	}
+	return false
+}
+
 func (b *wordsBase) save(fileName string) error {
 	f, err := os.Create(fileName)
 	if err != nil {
