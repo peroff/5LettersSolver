@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	releaseVersion = "0.6"
+	releaseVersion = "0.7"
 	releaseYear    = "2024"
 )
 
