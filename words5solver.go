@@ -142,6 +142,8 @@ mainLp:
 			}
 			currentWord = s
 			waitingForResponse = true
+			fmt.Printf("Выбрано слово \"%s\", введите его в приложении игры.\n",
+				currentWord)
 		} else {
 			if err := filter.update(currentWord, s); err != nil {
 				fmt.Printf("Некорректный ответ: %s\n\n", err)
