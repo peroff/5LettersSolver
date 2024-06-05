@@ -2,16 +2,17 @@ package main
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
+	"os"
+	"sort"
 	"strings"
 	"unicode/utf8"
 )
 
 type wordsBase struct {
 	items           []string
-	charsFreq       map[rune]int
-	itemFreqIndexes map[string]int
+	charsFreq       map[rune]int   // в скольки словах встречается каждая буква
+	itemFreqIndexes map[string]int // сумма частот букв для каждого слова
 }
 
 func loadBase(fileName string) (*wordsBase, error) {
@@ -20,12 +21,12 @@ func loadBase(fileName string) (*wordsBase, error) {
 		return nil, err
 	}
 
-	text := strings.ReplaceAll(strings.ToLower(string(b)), "ё", "е")
+	text := normalizeWord(string(b))
 	words := strings.Split(text, "\n")
 	for i := range words {
 		words[i] = strings.TrimSpace(words[i])
 		if wlen := utf8.RuneCountInString(words[i]); wlen != wordLen {
-			return nil, fmt.Errorf("wrong word length: %q (%d)", words[i], wlen)
+			return nil, wordLenError(words[i])
 		}
 	}
 
@@ -36,7 +37,7 @@ func loadBase(fileName string) (*wordsBase, error) {
 	}
 
 	if len(base.items) == 0 {
-		return nil, errors.New("empty base")
+		return nil, errors.New("в файле нет ни одного слова")
 	}
 
 	wordChars := newCharSet()
@@ -74,4 +75,35 @@ func (b *wordsBase) hasWord(word string) bool {
 		}
 	}
 	return false
+}
+
+func (b *wordsBase) removeWord(word string) bool {
+	for i := range b.items {
+		if b.items[i] == word {
+			l := len(b.items)
+			copy(b.items[i:l-1], b.items[i+1:l])
+			b.items = b.items[:l-1]
+			return true
+		}
+	}
+	return false
+}
+
+func (b *wordsBase) save(fileName string) error {
+	f, err := os.Create(fileName)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	words := make([]string, b.count())
+	copy(words, b.items)
+	sort.Strings(words)
+	_, err = f.WriteString(strings.Join(words, "\r\n"))
+	if err != nil {
+		os.Remove(fileName)
+		return err
+	}
+
+	return nil
 }

@@ -10,14 +10,15 @@ import (
 )
 
 const (
-	releaseVersion = "0.6"
+	releaseVersion = "0.7"
 	releaseYear    = "2024"
 )
 
 const (
 	wordsFile   = "words.txt"
-	maxWords    = 200
+	maxWords    = 50
 	wordsInLine = 10
+	removingCmd = "!!!" // префикс, активирующий функцию удаления слов из базы, например можно ввести: "!!! ёпрст"
 )
 
 type wordsInfo struct {
@@ -73,7 +74,7 @@ func printWords(words []string) {
 		}
 		fmt.Printf("  %s\n", strings.Join(words[offs:offs+cnt], ", "))
 	}
-	fmt.Printf("(%d total, %d shown)\n", total, len(words))
+	fmt.Printf("(%d всего, %d показано)\n", total, len(words))
 }
 
 func main() {
@@ -83,86 +84,124 @@ func main() {
 
 	base, err := loadBase(wordsFile)
 	if err != nil {
-		fmt.Printf("Words base loading error: %s\n", err)
+		fmt.Printf("Ошибка при загрузке базы слов: %s\n", err)
 		os.Exit(1)
 	}
-	fmt.Printf("Loaded words: %d\n\n", base.count())
+	fmt.Printf("Загружено слов: %d\n\n", base.count())
 
 	filter := newWordFilter()
 	input := bufio.NewScanner(os.Stdin)
 
 	move := 1
 	currentWord := ""
+	defaultWord := getStartWord(base)
 	waitingForResponse := false
 
 mainLp:
 	for {
-		if waitingForResponse {
-			fmt.Printf("%d. Enter app's response, 5 symbols: '+' - correct letter, '-' - wrong letter,\n", move)
-			fmt.Printf("   '.' - misplaced letter. Response (empty for exit): ")
-		} else {
+		if !waitingForResponse {
 			if move == 1 {
-				fmt.Printf("%d. Enter your first word (recommended: \"%s\"): ",
-					move, getStartWord(base))
+				fmt.Printf("%d. Введите слово, с которого начинаем (по умолчанию: \"%s\"): ",
+					move, defaultWord)
 			} else {
-				fmt.Printf("%d. Enter your next word (same there and in the app): ", move)
+				fmt.Printf("%d. Введите выбранное вами слово (по умолчанию: \"%s\"): ",
+					move, defaultWord)
 			}
+		} else {
+			fmt.Printf("%d. Введите ответ приложения (5 символов: '+' - буква отгадана,\n"+
+				"  '-' - отсутствует, '.' - не на своем месте), пустой для выхода: ", move)
 		}
 
 		if !input.Scan() {
-			break
+			break // ошибка
 		}
 		s := strings.TrimSpace(input.Text())
 		if s == "" {
-			break
+			if !waitingForResponse {
+				s = defaultWord
+			} else {
+				break
+			}
 		}
-		if utf8.RuneCountInString(s) != wordLen {
-			fmt.Printf("Wrong input length\n\n")
+
+		if strings.HasPrefix(s, removingCmd) {
+			removeWordsFromBase(base, strings.TrimPrefix(s, removingCmd))
 			continue
 		}
 
-		if waitingForResponse {
+		if utf8.RuneCountInString(s) != wordLen {
+			fmt.Printf("Неверное число символов\n\n")
+			continue
+		}
+
+		if !waitingForResponse {
+			s = normalizeWord(s)
+			if !base.hasWord(s) {
+				fmt.Printf("Неизвестное слово \"%s\"\n\n", s)
+				continue
+			}
+			currentWord = s
+			waitingForResponse = true
+			fmt.Printf("Выбрано слово \"%s\", введите его в приложении игры.\n",
+				currentWord)
+		} else {
 			if err := filter.update(currentWord, s); err != nil {
-				fmt.Printf("Wrong filter: %s\n\n", err)
+				fmt.Printf("Некорректный ответ: %s\n\n", err)
 				continue
 			}
 			move++
 			words, err := selectWords(base, filter)
 			if err != nil {
-				fmt.Printf("Oops! Internal error: %s\n", err)
+				fmt.Printf("Упс! Непредвиденная ошибка: %s\n", err)
 				os.Exit(1)
 			}
 			switch len(words) {
 			case 0:
-				fmt.Printf("\nNo possible words found :( Sorry...\n\n")
-				fmt.Print("Press ENTER for exit")
+				fmt.Printf("\nНе найдено подходящих слов :( Сожалею...\n\n")
+				fmt.Print("Нажмите ENTER для выхода")
 				input.Scan()
 				break mainLp
 			case 1:
-				fmt.Printf("\nFOUND! Your word: [%s]\n\n", words[0])
-				fmt.Print("Press ENTER for exit")
+				fmt.Printf("\nНАШЛИ! Ваше слово: \"%s\"\n\n", words[0])
+				fmt.Print("Нажмите ENTER для выхода")
 				input.Scan()
 				break mainLp
 			default:
-				fmt.Printf("\n%d. Possible words:\n", move)
+				fmt.Printf("\n%d. Возможные слова:\n", move)
 				printWords(words)
 				fmt.Println()
+				defaultWord = words[0]
 			}
-
-			// fmt.Printf("%s\n\n", filter)
 
 			waitingForResponse = false
-		} else {
-			s = strings.ReplaceAll(strings.ToLower(s), "ё", "е")
-			if !base.hasWord(s) {
-				fmt.Printf("Unknown word \"%s\"\n\n", s)
-				continue
-			}
-			currentWord = s
-			waitingForResponse = true
 		}
 	}
 	if err := input.Err(); err != nil {
 		panic(fmt.Sprintf("input scanning error: %s", err))
 	}
+}
+
+func removeWordsFromBase(base *wordsBase, words string) {
+	n := 0
+	for _, w := range strings.Split(normalizeWord(words), " ") {
+		w = strings.TrimSpace(w)
+		if w == "" {
+			continue
+		}
+		if base.removeWord(w) {
+			fmt.Printf("%s Удалено: \"%s\"\n", removingCmd, w)
+			n++
+		} else {
+			fmt.Printf("%s Не найдено: \"%s\"\n", removingCmd, w)
+		}
+	}
+
+	err := base.save(wordsFile)
+	if err != nil {
+		fmt.Printf("%s Ошибка сохранения базы: %s\n", removingCmd, err)
+		return
+	}
+
+	fmt.Printf("%s Успешно удалено слов: %d\n", removingCmd, n)
+	fmt.Println()
 }

@@ -13,9 +13,40 @@ func TestEmptyWordFilter(t *testing.T) {
 	}
 }
 
+func TestWordFilterClear(t *testing.T) {
+	filter := newWordFilter()
+	testWordFilterClearCase(t, filter, "abcde", "+++++")
+	testWordFilterClearCase(t, filter, "abcde", ".....")
+	testWordFilterClearCase(t, filter, "abcde", "-----")
+	testWordFilterClearCase(t, filter, "abcde", "+-+-+")
+	testWordFilterClearCase(t, filter, "abcde", "-.-.-")
+	testWordFilterClearCase(t, filter, "abcde", ".+.+.")
+}
+
+func testWordFilterClearCase(t *testing.T, filter *wordFilter, try, resp string) {
+	updateFilter(t, filter, try, resp)
+	filter.clear()
+
+	for i := 0; i < wordLen; i++ {
+		if filter.fixedChars[i] != 0 {
+			t.Fatalf("fixedChars[%d] isn't zero after clear()", i)
+		}
+		if filter.badChars[i].count() != 0 {
+			t.Fatalf("badChars[%d] isn't empty after clear()", i)
+		}
+	}
+	if filter.minCharCnt.count() != 0 {
+		t.Fatalf("minCharCnt isn't empty after clear()")
+	}
+	if filter.charCnt.count() != 0 {
+		t.Fatalf("charCnt isn't empty after clear()")
+	}
+}
+
 func TestWordFilter(t *testing.T) {
+	filter := newWordFilter()
 	for _, ts := range testSessions {
-		filter := newWordFilter()
+		filter.clear()
 
 		if !checkWord(t, filter, ts.secret) {
 			t.Fatalf("word %q doesn't pass empty filter", ts.secret)
@@ -24,11 +55,11 @@ func TestWordFilter(t *testing.T) {
 		passedWords := base.count()
 
 		for _, try := range ts.tries {
-			testTryWordFilter(t, filter, ts.secret, try.try, try.resp,
+			testWordFilterTry(t, filter, ts.secret, try.try, try.resp,
 				&passedWords)
 		}
 
-		testTryWordFilter(t, filter, ts.secret, ts.secret, allFixedCharsResp,
+		testWordFilterTry(t, filter, ts.secret, ts.secret, allFixedCharsResp,
 			&passedWords)
 
 		for _, w := range base.items {
@@ -40,7 +71,7 @@ func TestWordFilter(t *testing.T) {
 	}
 }
 
-func testTryWordFilter(t *testing.T, filter *wordFilter, secret, try,
+func testWordFilterTry(t *testing.T, filter *wordFilter, secret, try,
 	resp string, passedWords *int) {
 
 	updateFilter(t, filter, try, resp)
@@ -122,8 +153,9 @@ func TestWordFilterNegatives(t *testing.T) {
 		},
 	}
 
+	filter := newWordFilter()
 	for _, c := range cases {
-		filter := newWordFilter()
+		filter.clear()
 		updateFilter(t, filter, c.try, c.resp)
 		if checkWord(t, filter, c.test) {
 			t.Fatalf("wrong word passed: %q (after %q, %q)",

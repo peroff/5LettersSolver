@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 const wordLen = 5
 
 const (
@@ -19,13 +17,11 @@ func getGameResponse(secret, try string) (string, error) {
 	// массивы символов загаданного слова и предположения
 	secretChars := []rune(secret)
 	if len(secretChars) != wordLen {
-		return "", fmt.Errorf("wrong word length: %q (%d)",
-			secret, len(secretChars))
+		return "", wordLenError(secret)
 	}
 	tryChars := []rune(try)
 	if len(tryChars) != wordLen {
-		return "", fmt.Errorf("wrong word length: %q (%d)",
-			try, len(tryChars))
+		return "", wordLenError(try)
 	}
 
 	// число вхождений каждой буквы в загаданное слово

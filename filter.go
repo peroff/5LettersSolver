@@ -1,23 +1,24 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"sort"
 )
 
 type wordFilter struct {
 	fixedChars [wordLen]rune    // отгаданные буквы (на своих позициях)
 	badChars   [wordLen]charSet // буквы, которые не подходят для i-ой позиции
-	charCnt    map[rune]int     // точное число вхождений каждой известной буквы
-	minCharCnt map[rune]int     // минимально необходимое число вхождений каждой известной буквы
+	charCnt    charCounter      // точное число вхождений каждой известной буквы
+	minCharCnt charCounter      // минимально необходимое число вхождений каждой известной буквы
 }
 
 func (f *wordFilter) update(try, response string) error {
 	tryChars := []rune(try)
+	if len(tryChars) != wordLen {
+		return wordLenError(try)
+	}
 	respChars := []rune(response)
-	if len(tryChars) != wordLen || len(respChars) != wordLen {
-		return errors.New("wrong word length")
+	if len(respChars) != wordLen {
+		return wordLenError(response)
 	}
 
 	openCharCnt := make(map[rune]int)
@@ -45,7 +46,7 @@ func (f *wordFilter) update(try, response string) error {
 			// а потом (правее) точкой.
 			f.charCnt[tryChars[i]] = openCharCnt[tryChars[i]]
 		default:
-			return fmt.Errorf("unknown char \"%c\"", rc)
+			return fmt.Errorf("неизвестный символ \"%c\"", rc)
 		}
 	}
 
@@ -61,8 +62,7 @@ func (f *wordFilter) update(try, response string) error {
 func (f *wordFilter) checkWord(word string) (bool, error) {
 	wordChars := []rune(word)
 	if len(wordChars) != wordLen {
-		return false, fmt.Errorf("wrong word length: %q (%d)",
-			word, len(wordChars))
+		return false, wordLenError(word)
 	}
 
 	charCount := make(map[rune]int)
@@ -92,6 +92,15 @@ func (f *wordFilter) checkWord(word string) (bool, error) {
 	return true, nil
 }
 
+func (f *wordFilter) clear() {
+	for i := 0; i < wordLen; i++ {
+		f.fixedChars[i] = 0
+		f.badChars[i].clear()
+	}
+	f.minCharCnt.clear()
+	f.charCnt.clear()
+}
+
 func (f *wordFilter) String() string {
 	fixed := ""
 	for _, f := range f.fixedChars {
@@ -111,41 +120,14 @@ func (f *wordFilter) String() string {
 		}
 	}
 
-	min := charCntToStr(f.minCharCnt)
-
-	cnt := charCntToStr(f.charCnt)
-
 	return fmt.Sprintf("fixed: \"%s\"; bad: %s; min: %s; cnt: %s",
-		fixed, bad, min, cnt)
-}
-
-func charCntToStr(cnt map[rune]int) string {
-	if len(cnt) == 0 {
-		return ""
-	}
-
-	chars := make([]rune, 0, len(cnt))
-	for c, _ := range cnt {
-		chars = append(chars, c)
-	}
-	sort.Slice(chars, func(i, j int) bool { return chars[i] < chars[j] })
-
-	s := ""
-	for i, c := range chars {
-		if i < len(chars)-1 {
-			s += fmt.Sprintf("%c:%d, ", c, cnt[c])
-		} else {
-			s += fmt.Sprintf("%c:%d", c, cnt[c])
-		}
-	}
-
-	return s
+		fixed, bad, f.minCharCnt, f.charCnt)
 }
 
 func newWordFilter() *wordFilter {
 	f := &wordFilter{
-		charCnt:    make(map[rune]int),
-		minCharCnt: make(map[rune]int),
+		charCnt:    newCharCounter(),
+		minCharCnt: newCharCounter(),
 	}
 	for i := 0; i < wordLen; i++ {
 		f.badChars[i] = newCharSet()
