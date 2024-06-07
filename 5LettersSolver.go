@@ -78,7 +78,7 @@ func printWords(words []string) {
 }
 
 func main() {
-	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022-%s\n",
+	fmt.Printf("5LettersSolver v%s (c) Dan Peroff, 2022-%s\n",
 		releaseVersion, releaseYear)
 	fmt.Println()
 
