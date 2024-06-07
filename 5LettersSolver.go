@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	releaseVersion = "0.7"
+	releaseVersion = "0.8"
 	releaseYear    = "2024"
 )
 
@@ -78,7 +78,7 @@ func printWords(words []string) {
 }
 
 func main() {
-	fmt.Printf("Words5Solver v%s (c) Dan Peroff, 2022-%s\n",
+	fmt.Printf("5LettersSolver v%s (c) Dan Peroff, 2022-%s\n",
 		releaseVersion, releaseYear)
 	fmt.Println()
 
