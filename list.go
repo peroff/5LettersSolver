@@ -15,6 +15,31 @@ type wordList struct {
 	itemFreqIndexes map[string]int // сумма частот букв для каждого слова
 }
 
+func (wl *wordList) contains(word string) bool {
+	for _, w := range wl.items {
+		if w == word {
+			return true
+		}
+	}
+	return false
+}
+
+func (wl *wordList) remove(word string) bool {
+	for i := range wl.items {
+		if wl.items[i] == word {
+			l := len(wl.items)
+			copy(wl.items[i:l-1], wl.items[i+1:l])
+			wl.items = wl.items[:l-1]
+			return true
+		}
+	}
+	return false
+}
+
+func (wl *wordList) count() int {
+	return len(wl.items)
+}
+
 func (wl *wordList) load(fileName string) error {
 	b, err := ioutil.ReadFile(fileName)
 	if err != nil {
@@ -60,31 +85,6 @@ func (wl *wordList) load(fileName string) error {
 	}
 
 	return nil
-}
-
-func (wl *wordList) count() int {
-	return len(wl.items)
-}
-
-func (wl *wordList) contains(word string) bool {
-	for _, w := range wl.items {
-		if w == word {
-			return true
-		}
-	}
-	return false
-}
-
-func (wl *wordList) remove(word string) bool {
-	for i := range wl.items {
-		if wl.items[i] == word {
-			l := len(wl.items)
-			copy(wl.items[i:l-1], wl.items[i+1:l])
-			wl.items = wl.items[:l-1]
-			return true
-		}
-	}
-	return false
 }
 
 func (wl *wordList) save(fileName string) error {
