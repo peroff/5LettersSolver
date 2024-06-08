@@ -23,7 +23,7 @@ const (
 
 type wordsInfo struct {
 	words []string
-	base  *wordsBase
+	base  *wordList
 }
 
 func (wi *wordsInfo) Len() int { return len(wi.words) }
@@ -38,16 +38,16 @@ func (wi *wordsInfo) Swap(i, j int) {
 	wi.words[i], wi.words[j] = wi.words[j], wi.words[i]
 }
 
-func sortWordsByCharsFreq(words []string, base *wordsBase) {
+func sortWordsByCharsFreq(words []string, base *wordList) {
 	info := &wordsInfo{words, base}
 	sort.Sort(info)
 }
 
-func getStartWord(base *wordsBase) string {
+func getStartWord(base *wordList) string {
 	return "норка"
 }
 
-func selectWords(base *wordsBase, filter *wordFilter) ([]string, error) {
+func selectWords(base *wordList, filter *wordFilter) ([]string, error) {
 	res := []string{}
 	for _, word := range base.items {
 		ok, err := filter.checkWord(word)
@@ -82,7 +82,8 @@ func main() {
 		releaseVersion, releaseYear)
 	fmt.Println()
 
-	base, err := loadBase(wordsFile)
+	base := newWordList()
+	err := base.load(wordsFile)
 	if err != nil {
 		fmt.Printf("Ошибка при загрузке базы слов: %s\n", err)
 		os.Exit(1)
@@ -181,7 +182,7 @@ mainLp:
 	}
 }
 
-func removeWordsFromBase(base *wordsBase, words string) {
+func removeWordsFromBase(base *wordList, words string) {
 	n := 0
 	for _, w := range strings.Split(normalizeWord(words), " ") {
 		w = strings.TrimSpace(w)

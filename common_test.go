@@ -11,7 +11,7 @@ var (
 	allDeadCharsResp  = strings.Repeat(string(deadCharResp), wordLen)
 )
 
-var base *wordsBase
+var base *wordList
 
 type gameTry struct {
 	try  string
@@ -389,8 +389,8 @@ var testSessions = []gameSession{
 }
 
 func init() {
-	var err error
-	base, err = loadBase(wordsFile)
+	base = newWordList()
+	err := base.load(wordsFile)
 	if err != nil {
 		panic(fmt.Sprintf("Words base loading error: %s", err))
 	}
