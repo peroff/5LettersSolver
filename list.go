@@ -15,6 +15,10 @@ type wordList struct {
 	itemFreqIndexes map[string]int // сумма частот букв для каждого слова
 }
 
+func (wl *wordList) add(word string) {
+	wl.items = append(wl.items, word)
+}
+
 func (wl *wordList) contains(word string) bool {
 	for _, w := range wl.items {
 		if w == word {
