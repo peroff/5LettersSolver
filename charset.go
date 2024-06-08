@@ -21,14 +21,14 @@ func (cs charSet) count() int {
 	return len(cs)
 }
 
-func (cs charSet) has(char rune) bool {
+func (cs charSet) contains(char rune) bool {
 	_, ok := cs[char]
 	return ok
 }
 
-func (cs charSet) hasAll(chars charSet) bool {
+func (cs charSet) containsAll(chars charSet) bool {
 	for c, _ := range chars {
-		if !cs.has(c) {
+		if !cs.contains(c) {
 			return false
 		}
 	}

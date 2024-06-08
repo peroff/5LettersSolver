@@ -71,7 +71,7 @@ func (f *wordFilter) checkWord(word string) (bool, error) {
 		if fixed := f.fixedChars[i]; fixed != 0 && wc != fixed {
 			return false, nil
 		}
-		if f.badChars[i].has(wc) {
+		if f.badChars[i].contains(wc) {
 			return false, nil
 		}
 		charCount[wc]++

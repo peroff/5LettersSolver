@@ -71,7 +71,7 @@ func (wl *wordList) load(fileName string) error {
 	for _, word := range wl.items {
 		wordChars.clear()
 		for _, c := range word {
-			if !wordChars.has(c) {
+			if !wordChars.contains(c) {
 				wl.charsFreq[c]++
 				wordChars.add(c)
 			}
@@ -81,7 +81,7 @@ func (wl *wordList) load(fileName string) error {
 	for _, word := range wl.items {
 		wordChars.clear()
 		for _, c := range word {
-			if !wordChars.has(c) {
+			if !wordChars.contains(c) {
 				wl.itemFreqIndexes[word] += wl.charsFreq[c]
 				wordChars.add(c)
 			}
