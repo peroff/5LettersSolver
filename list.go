@@ -66,7 +66,7 @@ func (wl *wordList) count() int {
 	return len(wl.items)
 }
 
-func (wl *wordList) hasWord(word string) bool {
+func (wl *wordList) contains(word string) bool {
 	for _, w := range wl.items {
 		if w == word {
 			return true
@@ -75,7 +75,7 @@ func (wl *wordList) hasWord(word string) bool {
 	return false
 }
 
-func (wl *wordList) removeWord(word string) bool {
+func (wl *wordList) remove(word string) bool {
 	for i := range wl.items {
 		if wl.items[i] == word {
 			l := len(wl.items)

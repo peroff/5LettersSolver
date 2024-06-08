@@ -137,7 +137,7 @@ mainLp:
 
 		if !waitingForResponse {
 			s = normalizeWord(s)
-			if !base.hasWord(s) {
+			if !base.contains(s) {
 				fmt.Printf("Неизвестное слово \"%s\"\n\n", s)
 				continue
 			}
@@ -189,7 +189,7 @@ func removeWordsFromBase(base *wordList, words string) {
 		if w == "" {
 			continue
 		}
-		if base.removeWord(w) {
+		if base.remove(w) {
 			fmt.Printf("%s Удалено: \"%s\"\n", removingCmd, w)
 			n++
 		} else {
