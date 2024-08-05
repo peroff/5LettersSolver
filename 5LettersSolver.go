@@ -121,7 +121,7 @@ mainLp:
 			words, err := strategy.GetNextMoveTries(move, currentWord, s)
 			if err != nil {
 				if !isFatalStratError(err) {
-					fmt.Printf("Ошибка: %s\n\n", err)
+					fmt.Printf("%s\n\n", capitalizeFirstWord(err.Error()))
 					continue
 				} else {
 					fmt.Printf("Упс! Непредвиденная ошибка: %s\n", err)

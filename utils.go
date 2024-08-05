@@ -14,3 +14,11 @@ func newWordLenError(word string) error {
 func normalizeWord(word string) string {
 	return strings.ReplaceAll(strings.ToLower(word), "ё", "е")
 }
+
+func capitalizeFirstWord(text string) string {
+	words := strings.Split(text, " ")
+	if len(words) > 0 {
+		words[0] = strings.Title(words[0])
+	}
+	return strings.Join(words, " ")
+}
