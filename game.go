@@ -17,11 +17,11 @@ func getGameResponse(secret, try string) (string, error) {
 	// массивы символов загаданного слова и предположения
 	secretChars := []rune(secret)
 	if len(secretChars) != wordLen {
-		return "", wordLenError(secret)
+		return "", newWordLenError(secret)
 	}
 	tryChars := []rune(try)
 	if len(tryChars) != wordLen {
-		return "", wordLenError(try)
+		return "", newWordLenError(try)
 	}
 
 	// число вхождений каждой буквы в загаданное слово

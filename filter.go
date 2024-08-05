@@ -14,11 +14,11 @@ type wordFilter struct {
 func (f *wordFilter) update(try, response string) error {
 	tryChars := []rune(try)
 	if len(tryChars) != wordLen {
-		return wordLenError(try)
+		return newWordLenError(try)
 	}
 	respChars := []rune(response)
 	if len(respChars) != wordLen {
-		return wordLenError(response)
+		return newWordLenError(response)
 	}
 
 	openCharCnt := make(map[rune]int)
@@ -62,7 +62,7 @@ func (f *wordFilter) update(try, response string) error {
 func (f *wordFilter) checkWord(word string) (bool, error) {
 	wordChars := []rune(word)
 	if len(wordChars) != wordLen {
-		return false, wordLenError(word)
+		return false, newWordLenError(word)
 	}
 
 	charCount := make(map[rune]int)

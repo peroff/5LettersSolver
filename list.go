@@ -53,7 +53,7 @@ func (wl *wordList) load(fileName string) error {
 	for i := range words {
 		words[i] = strings.TrimSpace(words[i])
 		if wlen := utf8.RuneCountInString(words[i]); wlen != wordLen {
-			return wordLenError(words[i])
+			return newWordLenError(words[i])
 		}
 	}
 
