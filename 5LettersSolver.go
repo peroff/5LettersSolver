@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"sort"
 	"strings"
 	"unicode/utf8"
 )
@@ -21,45 +20,14 @@ const (
 	removingCmd = "!!!" // префикс, активирующий функцию удаления слов из базы, например можно ввести: "!!! ёпрст"
 )
 
-type wordsInfo struct {
-	words []string
-	base  *wordList
-}
-
-func (wi *wordsInfo) Len() int { return len(wi.words) }
-
-func (wi *wordsInfo) Less(i, j int) bool {
-	f1 := wi.base.itemFreqIndexes[wi.words[i]]
-	f2 := wi.base.itemFreqIndexes[wi.words[j]]
-	return f1 >= f2
-}
-
-func (wi *wordsInfo) Swap(i, j int) {
-	wi.words[i], wi.words[j] = wi.words[j], wi.words[i]
-}
-
-func sortWordsByCharsFreq(words []string, base *wordList) {
-	info := &wordsInfo{words, base}
-	sort.Sort(info)
-}
-
-func getStartWord(base *wordList) string {
-	return "норка"
-}
-
-func selectWords(base *wordList, filter *wordFilter) ([]string, error) {
-	res := []string{}
-	for _, word := range base.items {
-		ok, err := filter.checkWord(word)
-		if err != nil {
-			return nil, err
-		}
-		if ok {
-			res = append(res, word)
-		}
+func getStartWord(strategy Strategy) string {
+	tries, err := strategy.GetFirstMoveTries()
+	if err != nil {
+		fmt.Printf("Ошибка при выборе начального слова: %s\n", err)
+		os.Exit(1)
 	}
-	sortWordsByCharsFreq(res, base)
-	return res, nil
+
+	return tries[0]
 }
 
 func printWords(words []string) {
@@ -90,12 +58,14 @@ func main() {
 	}
 	fmt.Printf("Загружено слов: %d\n\n", base.count())
 
-	filter := newWordFilter()
+	var strategy Strategy = NewSieveStrategy()
+	strategy.Init(base)
+
 	input := bufio.NewScanner(os.Stdin)
 
 	move := 1
 	currentWord := ""
-	defaultWord := getStartWord(base)
+	defaultWord := getStartWord(strategy)
 	waitingForResponse := false
 
 mainLp:
@@ -146,16 +116,19 @@ mainLp:
 			fmt.Printf("Выбрано слово \"%s\", введите его в приложении игры.\n",
 				currentWord)
 		} else {
-			if err := filter.update(currentWord, s); err != nil {
-				fmt.Printf("Некорректный ответ: %s\n\n", err)
-				continue
-			}
 			move++
-			words, err := selectWords(base, filter)
+
+			words, err := strategy.GetNextMoveTries(move, currentWord, s)
 			if err != nil {
-				fmt.Printf("Упс! Непредвиденная ошибка: %s\n", err)
-				os.Exit(1)
+				if !isFatalStratError(err) {
+					fmt.Printf("Ошибка: %s\n\n", err)
+					continue
+				} else {
+					fmt.Printf("Упс! Непредвиденная ошибка: %s\n", err)
+					os.Exit(1)
+				}
 			}
+
 			switch len(words) {
 			case 0:
 				fmt.Printf("\nНе найдено подходящих слов :( Сожалею...\n\n")

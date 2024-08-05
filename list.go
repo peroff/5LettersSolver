@@ -10,9 +10,7 @@ import (
 )
 
 type wordList struct {
-	items           []string
-	charsFreq       map[rune]int   // в скольки словах встречается каждая буква
-	itemFreqIndexes map[string]int // сумма частот букв для каждого слова
+	items []string
 }
 
 func (wl *wordList) add(word string) {
@@ -60,32 +58,8 @@ func (wl *wordList) load(fileName string) error {
 	}
 
 	wl.items = words
-	wl.charsFreq = make(map[rune]int)
-	wl.itemFreqIndexes = make(map[string]int)
-
 	if len(wl.items) == 0 {
 		return errors.New("в файле нет ни одного слова")
-	}
-
-	wordChars := newCharSet()
-	for _, word := range wl.items {
-		wordChars.clear()
-		for _, c := range word {
-			if !wordChars.contains(c) {
-				wl.charsFreq[c]++
-				wordChars.add(c)
-			}
-		}
-	}
-
-	for _, word := range wl.items {
-		wordChars.clear()
-		for _, c := range word {
-			if !wordChars.contains(c) {
-				wl.itemFreqIndexes[word] += wl.charsFreq[c]
-				wordChars.add(c)
-			}
-		}
 	}
 
 	return nil
@@ -111,9 +85,5 @@ func (wl *wordList) save(fileName string) error {
 }
 
 func newWordList() *wordList {
-	return &wordList{
-		items:           make([]string, 0),
-		charsFreq:       make(map[rune]int),
-		itemFreqIndexes: make(map[string]int),
-	}
+	return &wordList{}
 }
